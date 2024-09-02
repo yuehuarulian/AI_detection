@@ -1,0 +1,10 @@
+dataset/
+LGrad/Grad_data_paper/
+LAA-Net/LAA-Net pretrained.zip
+binary_deepfake_detection/configs/
+__pycache__/
+checkpoints/
+*.pkl
+*.pth
+binary_deepfake_detection/
+UniversalFakeDetect/
