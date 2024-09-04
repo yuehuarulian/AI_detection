@@ -14,7 +14,11 @@ class BaseModel(nn.Module):
         self.isTrain = opt.isTrain
         self.lr = opt.lr
         self.save_dir = os.path.join(opt.checkpoints_dir, opt.name)
-        self.device = torch.device('cuda:{}'.format(opt.gpu_ids[0])) if opt.gpu_ids else torch.device('cpu')
+        # 修改设备选择，如果有 GPU 则使用 'cuda'，否则使用 'cpu'
+        if torch.cuda.is_available() and opt.gpu_ids:
+            self.device = torch.device('cuda')  # 使用所有可用的 GPU
+        else:
+            self.device = torch.device('cpu')  # 使用 CPU
 
     def save_networks(self, epoch):
         save_filename = 'model_epoch_%s.pth' % epoch

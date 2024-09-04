@@ -48,7 +48,7 @@ sh ./transform_img2grad.sh {GPU-ID} {Data-Root-Dir} {Grad-Save-Dir}
 ## Training the model 
 ```sh
 sh ./train-detector.sh {GPU-ID} {Grad-Save-Dir}
-python train.py --name 1class-resnet-horse --dataroot ../Grad_data_paper --classes horse --batch_size 16 --delr_freq 10 --lr 0.0005 --niter 100 --gpu_id=0
+python train.py --name 1class-resnet-phase --dataroot ../Grad_data_paper --classes phase --batch_size 32 --delr_freq 10 --lr 0.0005 --niter 100 --gpu_id=0,1,2,3,4,5,6,7
 ```
 
 ## Testing the detector

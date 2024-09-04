@@ -20,6 +20,13 @@ class Trainer(BaseModel):
         if not self.isTrain or opt.continue_train:
             self.model = resnet50(num_classes=1)
 
+        # 将模型放置到指定的设备上
+        self.model.to(self.device)
+
+        # 如果使用多个 GPU，使用 DataParallel 来包装模型
+        if len(opt.gpu_ids) > 1:
+            self.model = nn.DataParallel(self.model, device_ids=opt.gpu_ids)
+
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()
             # initialize optimizers
@@ -34,8 +41,6 @@ class Trainer(BaseModel):
 
         if not self.isTrain or opt.continue_train:
             self.load_networks(opt.epoch)
-        self.model.to(opt.gpu_ids[0])
- 
 
     def adjust_learning_rate(self, min_lr=1e-6):
         for param_group in self.optimizer.param_groups:
@@ -61,7 +66,7 @@ class Trainer(BaseModel):
 
     def optimize_parameters(self):
         self.forward()
-        self.loss = self.loss_fn(self.output.squeeze(1), self.label)
+        self.loss = self.get_loss()  # 修改这里，复用 get_loss 方法
         self.optimizer.zero_grad()
         self.loss.backward()
         self.optimizer.step()
