@@ -34,7 +34,10 @@ class Trainer(BaseModel):
 
         if not self.isTrain or opt.continue_train:
             self.load_networks(opt.epoch)
-        self.model.to(opt.gpu_ids[0])
+
+        self.model.to(self.device)
+        if len(opt.gpu_ids) > 1:
+            self.model = nn.DataParallel(self.model, device_ids=opt.gpu_ids)
  
 
     def adjust_learning_rate(self, min_lr=1e-6):
@@ -61,7 +64,7 @@ class Trainer(BaseModel):
 
     def optimize_parameters(self):
         self.forward()
-        self.loss = self.loss_fn(self.output.squeeze(1), self.label)
+        self.loss = self.get_loss()
         self.optimizer.zero_grad()
         self.loss.backward()
         self.optimizer.step()
