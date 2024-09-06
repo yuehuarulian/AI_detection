@@ -13,11 +13,11 @@ from networks.trainer import Trainer
 from options.train_options import TrainOptions
 from options.test_options import TestOptions
 from util import Logger
-
+# python train.py --name 1class-resnet-phase --dataroot ../Grad_data_paper --classes phase --batch_size 16 --delr_freq 20 --lr 0.0005 --niter 300 --epoch 100
 
 # test config
-vals = ['progan', 'stylegan', 'stylegan2', 'biggan', 'cyclegan', 'stargan', 'gaugan', 'deepfake']
-multiclass = [1, 1, 1, 0, 1, 0, 0, 0]
+vals = ['biggan', 'stargan', 'gaugan', 'deepfake', 'phase']
+multiclass = [0, 0, 0, 0, 0]
 
 
 def get_val_opt():
@@ -84,7 +84,7 @@ if __name__ == '__main__':
             print(time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime()), 'changing lr at the end of epoch %d, iters %d' %
                   (epoch, model.total_steps))
             model.adjust_learning_rate()
-            model.eval();testmodel();model.train()
+            model.eval();testmodel();model.train();model.save_networks(epoch=epoch)
             
 
         # Validation

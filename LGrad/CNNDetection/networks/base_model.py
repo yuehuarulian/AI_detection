@@ -21,13 +21,17 @@ class BaseModel(nn.Module):
         save_path = os.path.join(self.save_dir, save_filename)
 
         # serialize model and optimizer to dict
-        # state_dict = {
-        #     'model': self.model.state_dict(),
-        #     'optimizer' : self.optimizer.state_dict(),
-        #     'total_steps' : self.total_steps,
-        # }
+        state_dict = {
+            'model': self.model.state_dict(),
+            'optimizer' : self.optimizer.state_dict(),
+            'total_steps' : self.total_steps,
+        }
 
-        torch.save(self.model.state_dict(), save_path)
+        # torch.save(state_dict, save_path)
+        if epoch == 'last':
+            torch.save(self.model.state_dict(), save_path)
+        else:
+            torch.save(state_dict, save_path)
         print(f'Saving model {save_path}')
 
     # load models from the disk
