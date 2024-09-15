@@ -42,6 +42,11 @@ class Trainer(BaseModel):
         if not self.isTrain or opt.continue_train:
             self.load_networks(opt.epoch)
 
+        self.model.to(self.device)
+        if len(opt.gpu_ids) > 1:
+            self.model = nn.DataParallel(self.model, device_ids=opt.gpu_ids)
+ 
+
     def adjust_learning_rate(self, min_lr=1e-6):
         for param_group in self.optimizer.param_groups:
             param_group['lr'] *= 0.8
@@ -66,7 +71,7 @@ class Trainer(BaseModel):
 
     def optimize_parameters(self):
         self.forward()
-        self.loss = self.get_loss()  # 修改这里，复用 get_loss 方法
+        self.loss = self.get_loss()
         self.optimizer.zero_grad()
         self.loss.backward()
         self.optimizer.step()

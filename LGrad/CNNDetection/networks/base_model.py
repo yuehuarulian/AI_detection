@@ -14,6 +14,7 @@ class BaseModel(nn.Module):
         self.isTrain = opt.isTrain
         self.lr = opt.lr
         self.save_dir = os.path.join(opt.checkpoints_dir, opt.name)
+        # self.device = torch.device('cuda:{}'.format(opt.gpu_ids[0])) if opt.gpu_ids else torch.device('cpu')
         # 修改设备选择，如果有 GPU 则使用 'cuda'，否则使用 'cpu'
         if torch.cuda.is_available() and opt.gpu_ids:
             self.device = torch.device('cuda')  # 使用所有可用的 GPU
@@ -25,13 +26,17 @@ class BaseModel(nn.Module):
         save_path = os.path.join(self.save_dir, save_filename)
 
         # serialize model and optimizer to dict
-        # state_dict = {
-        #     'model': self.model.state_dict(),
-        #     'optimizer' : self.optimizer.state_dict(),
-        #     'total_steps' : self.total_steps,
-        # }
+        state_dict = {
+            'model': self.model.state_dict(),
+            'optimizer' : self.optimizer.state_dict(),
+            'total_steps' : self.total_steps,
+        }
 
-        torch.save(self.model.state_dict(), save_path)
+        # torch.save(state_dict, save_path)
+        if epoch == 'last':
+            torch.save(self.model.state_dict(), save_path)
+        else:
+            torch.save(state_dict, save_path)
         print(f'Saving model {save_path}')
 
     # load models from the disk
