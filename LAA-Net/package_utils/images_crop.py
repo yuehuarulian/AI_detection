@@ -15,8 +15,9 @@ from retinaface.utils import vis_annotations
 import torch
 
 
-ROOT = '/data/deepfake_cluster/datasets_df'
-SAVE_DIR = f'{ROOT}/FaceForensics++/c0'
+# ROOT = '/data/deepfake_cluster/datasets_df'
+ROOT = './data'
+SAVE_DIR = f'{ROOT}/'
 IMAGE_H, IMAGE_W, IMAGE_C = 256, 256, 3
 PADDING = 0.25
 
@@ -82,10 +83,10 @@ def facecrop(model, org_path, save_path, period=1, num_frames=10, dataset='origi
                     score = faces[face_idx]['score']                    
                     
                     if face_s > face_s_max and score > score_max:
-                        f_c_x0 = max(0, x0 - int(face_w*padding))
-                        f_c_x1 = min(width, x1 + int(face_w*padding))
-                        f_c_y0 = max(0, y0 - int(face_h*padding))
-                        f_c_y1 = min(height, y1 + int(face_h*padding))
+                        f_c_x0 = int(max(0, x0 - int(face_w*padding)))
+                        f_c_x1 = int(min(width, x1 + int(face_w*padding)))
+                        f_c_y0 = int(max(0, y0 - int(face_h*padding)))
+                        f_c_y1 = int(min(height, y1 + int(face_h*padding)))
                         
                         face_crop = frame_org[f_c_y0:f_c_y1, f_c_x0:f_c_x1, :]
                         if mask_path is not None:
@@ -143,11 +144,13 @@ if __name__=='__main__':
 
     # Setting the dataset path based on the dataset name
     if args.dataset=='Original':
-        dataset_path='{}/FaceForensics++/original_download/original_sequences/youtube/'.format(ROOT)
+        # dataset_path='{}/FaceForensics++/original_download/original_sequences/youtube/'.format(ROOT)
+        dataset_path='{}/original_sequences/youtube/'.format(ROOT)
     elif args.dataset=='DeepFakeDetection_original':
-        dataset_path='/data/FaceForensics++/original_sequences/actors/{}/'.format(args.comp)
+        dataset_path='/data/original_sequences/actors/{}/'.format(args.comp)
     elif args.dataset in ['DeepFakeDetection','FaceShifter','Face2Face','Deepfakes','FaceSwap','NeuralTextures']:
-        dataset_path='{}/FaceForensics++/original_download/manipulated_sequences/{}/'.format(ROOT, args.dataset)
+        # dataset_path='{}/FaceForensics++/original_download/manipulated_sequences/{}/'.format(ROOT, args.dataset)
+        dataset_path='{}/manipulated_sequences/{}/'.format(ROOT, args.dataset)
     elif args.dataset in ['Celeb-real','Celeb-synthesis','YouTube-real']:
         if 'v1' in SAVE_DIR:
             dataset_path='{}/Celeb-DFv1/'.format(ROOT)
@@ -170,7 +173,8 @@ if __name__=='__main__':
         mask_mov_paths = os.path.join(dataset_path, 'masks', 'videos/')
         
         # Annotation file for FF++
-        with open(f'{ROOT}/FaceForensics++/original_download/{args.task}.json') as f:
+        # with open(f'{ROOT}/FaceForensics++/original_download/{args.task}.json') as f:
+        with open(f'{ROOT}/{args.task}.json') as f:
             vid_ids = json.load(f)
     elif args.dataset in ['Celeb-real', 'Celeb-synthesis', 'YouTube-real']:
         if 'v1' in SAVE_DIR:
@@ -185,7 +189,8 @@ if __name__=='__main__':
         movies_path = os.path.join(dataset_path, args.task, 'videos')
         
         # Annotation file for DFDC
-        with open(os.path.join(dataset_path, args.task, 'labels.csv')) as f:
+        with open(f'{ROOT}/{args.task}.json') as f:
+        # with open(f'{ROOT}/FaceForensics++/original_download/{args.task}.json') as f:
             df = pd.read_csv(f)
             # df['path'] = df['label'].astype(str) + '/' + df['filename']
             vid_ids = df['filename'].values.reshape(-1)
@@ -209,7 +214,7 @@ if __name__=='__main__':
     for i in range(len(vid_ids)):    
         if args.dataset == 'Original':   
             file_list += vid_ids[i]
-        elif args.dataset in ['Face2Face','Deepfakes','FaceSwap','NeuralTextures']:
+        elif args.dataset in ['Face2Face','Deepfakes','FaceSwap','NeuralTextures','FaceShifter']:
             file_list.append('_'.join([vid_ids[i][0], vid_ids[i][1]]))
             file_list.append('_'.join([vid_ids[i][1], vid_ids[i][0]]))
         elif args.dataset in ['method_A','method_B','original_videos']:

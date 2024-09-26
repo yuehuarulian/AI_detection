@@ -59,7 +59,8 @@ def train(cfg, model, critetion, optimizer, epoch, data_loader, logger, writer, 
     start = time.time()
     for i, batch_data in enumerate(data_loader):
         inputs, labels, targets, heatmaps, cstency_heatmaps, offsets = get_batch_data(batch_data)
-        inputs = inputs.cuda().to(non_blocking=True, dtype=torch.float64)
+        # inputs = inputs.cuda().to(non_blocking=True, dtype=torch.float64)
+        inputs = inputs.to(devices, non_blocking=True, dtype=torch.float64).cuda()
         #Measuring data loading time
         data_time.update(time.time() - start)
         
@@ -72,8 +73,8 @@ def train(cfg, model, critetion, optimizer, epoch, data_loader, logger, writer, 
             if isinstance(outputs, dict):
                 outputs_hm = outputs['hm']
                 outputs_cls = outputs['cls']
-                outputs_offset = outputs['offset'] if 'offset' in outputs.keys() else None
-                outputs_cstency = outputs['cstency'] if 'cstency' in outputs.keys() else None
+                outputs_offset = outputs['offset'] if 'offset' in outputs.keys() else None # 偏移损失
+                outputs_cstency = outputs['cstency'] if 'cstency' in outputs.keys() else None # 一致性损失
                 
                 if idx == 0:
                     first_outputs_hm = outputs_hm
@@ -166,6 +167,14 @@ def train(cfg, model, critetion, optimizer, epoch, data_loader, logger, writer, 
         trainIters += 1
         if cfg.TRAIN.tensorboard:
             board_writing(writer, losses.avg, acc.avg, trainIters, 'Train')
+            if 'cls' in loss_.keys():
+                writer.add_scalar('Train/loss_cls', loss_['cls'].item(), trainIters)
+            if 'dst_hm_cls' in loss_.keys():
+                writer.add_scalar('Train/loss_dst_hm_cls', loss_['dst_hm_cls'].item(), trainIters)
+            if 'offset' in loss_.keys():
+                writer.add_scalar('Train/loss_offset', loss_['offset'].item(), trainIters)
+            if 'cstency' in loss_.keys():
+                writer.add_scalar('Train/loss_cstency', loss_['cstency'].item(), trainIters)
     return losses, acc, trainIters
 
 
@@ -184,6 +193,7 @@ def validate(cfg, model, critetion, epoch, data_loader, logger, writer, devices,
         for i, batch_data in enumerate(data_loader):
             inputs, labels, targets, heatmaps, cstency_heatmaps, offsets = get_batch_data(batch_data)
             inputs = inputs.to(devices, non_blocking=True, dtype=torch.float64).cuda()
+            # inputs = inputs.cuda(non_blocking=True, dtype=torch.float64)
             #Measuring data loading time
             data_time.update(time.time() - start)
             
@@ -254,7 +264,15 @@ def validate(cfg, model, critetion, epoch, data_loader, logger, writer, devices,
             valIters += 1
             if cfg.TRAIN.tensorboard:
                 board_writing(writer, losses.avg, acc.avg, valIters, 'Val')
-
+                if 'cls' in loss_.keys():
+                    writer.add_scalar('Train/loss_cls', loss_['cls'].item(), valIters)
+                if 'dst_hm_cls' in loss_.keys():
+                    writer.add_scalar('Train/loss_dst_hm_cls', loss_['dst_hm_cls'].item(), valIters)
+                if 'offset' in loss_.keys():
+                    writer.add_scalar('Train/loss_offset', loss_['offset'].item(), valIters)
+                if 'cstency' in loss_.keys():
+                    writer.add_scalar('Train/loss_cstency', loss_['cstency'].item(), valIters)
+    
             #Logging
             params = {}
             if 'Combined' in cfg.TRAIN.loss.type:

@@ -49,7 +49,7 @@ class FF(CommonDataset):
                     img_paths_ = glob(f'{sub_dir_path}/*.{self._cfg.IMAGE_SUFFIX}')
 
                     img_paths.extend(img_paths_)
-                    labels.extend(np.full(len(img_paths_), int(ft != 'original')))
+                    labels.extend(np.full(len(img_paths_), int(ft != 'Original')))
                 
         print('{} image paths have been loaded from FF++!'.format(len(img_paths)))          
         return img_paths, labels, mask_paths, ot_props

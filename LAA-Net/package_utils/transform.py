@@ -118,7 +118,7 @@ def randaffine(img, mask):
 			
     g = alb.ElasticTransform(alpha=50, 
                              sigma=7,
-		                     alpha_affine=0,
+		                     alpha_affine=None,
 		                     p=1)
 
     transformed=f(image=img,mask=mask)

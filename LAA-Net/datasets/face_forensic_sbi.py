@@ -93,7 +93,7 @@ class SBIFaceForensic(MasterDataset):
     def __getitem__(self, idx):
         flag = True
         while flag:
-            try:
+            # try:
                 #Selecting data from data list
                 img_path = self.image_paths_r[idx]
                 label = self.labels_r[idx]
@@ -258,10 +258,11 @@ class SBIFaceForensic(MasterDataset):
                     
                 label = np.expand_dims(label, axis=-1)
                 flag = False
-            except Exception as e:
-                # print(f'There is something wrong! Please check the DataLoader!, {e}')
-                flag = True
-                idx=torch.randint(low=0, high=self.__len__(), size=(1,)).item()
+            # except Exception as e:
+            #     print(f'Error encountered: {e}')
+            #     # print(f'There is something wrong! Please check the DataLoader!, {e}')
+            #     flag = True
+            #     idx=torch.randint(low=0, high=self.__len__(), size=(1,)).item()
                 
         if self.train:
             return patch_img_trans_f, patch_heatmap_f, patch_target_f, patch_cstency_f, patch_img_trans, patch_heatmap_r, patch_target_r, patch_cstency_r

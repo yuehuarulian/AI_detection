@@ -8,7 +8,8 @@ if not os.getcwd() in sys.path:
     sys.path.append(os.getcwd())
 import random
 
-import simplejson as json
+# import simplejson as json
+import json
 from box import Box as edict
 from glob import glob
 import dlib
@@ -74,6 +75,7 @@ class LandmarkUtility(object):
         Currenly, Using Glob for loading file with regex
         It might be changed for better performance in large datasets
         """
+        print(self.image_root)
         assert os.path.exists(self.image_root), "Root path to dataset can not be None!"
         data_type = self.data_type
         fake_types = self.fake_types
@@ -92,7 +94,8 @@ class LandmarkUtility(object):
                 img_paths.extend(img_paths_)
                 
         print('{} image paths have been loaded from {}!'.format(len(img_paths), self.dataset))
-        file_names = [ip.split('/')[-1] for ip in img_paths]
+        # file_names = [ip.split('/')[-1] for ip in img_paths]
+        file_names = [ip.replace('\\','/').split('/')[-1] for ip in img_paths]
 
         return img_paths, file_names
 
@@ -117,7 +120,8 @@ class LandmarkUtility(object):
         return obj
     
     def _load_image(self, img_path):
-        image = cv2.imread(os.path.join(self.image_root, img_path))
+        # image = cv2.imread(os.path.join(self.image_root, img_path))
+        image = cv2.imread(img_path)
         return image
 
     def _facial_landmark(self, image, detector, lm_predictor):
@@ -210,8 +214,12 @@ class LandmarkUtility(object):
                 aligned_lmses = kwargs['aligned_lmses']
                 assert len(aligned_lmses) == len(img_paths), "The length of images and aligned landmarks is not compatible!"
         
+        print(img_paths[0])
         for i, (p, f) in enumerate(zip(img_paths, file_names)):
-            fake_type = p.split('/')[-2] if self.fake_types != ['original'] else self.fake_types[0]
+            # print(p.split('/')[-3])
+            # print(p.split('/')[-3].split('_')[-2])
+            fake_type = p.split('/')[-3].split('_')[-2] if self.fake_types != ['Original'] else self.fake_types[0]
+            # fake_type = p.split('/')[-2] if self.fake_types != ['original'] else self.fake_types[0]
             img_obj = self._img_obj(p, f, id=i, fake_type=fake_type)
             
             if 'orig_lmses' in kwargs.keys(): 
@@ -223,7 +231,7 @@ class LandmarkUtility(object):
 
     def save2json(self, data, fn='faceforensics_processed.json'):
         assert len(data), "Data can not be empty!"
-        target = "processed_data/{}".format(self.compression)
+        target = "./processed_data/{}".format(self.compression)
         if not os.path.exists(target):
             os.mkdir(target)
         fp = os.path.join(target, fn)
@@ -271,7 +279,8 @@ if __name__ == '__main__':
                 os.makedirs(f'{lm_ins.image_root}{lm_ins.split}/{lm_ins.data_type}/aligned_{lm_ins.fake_types[0]}_{cfg.PREPROCESSING.N_LANDMARKS}/{vid_id}', exist_ok=True)
 
                 aligned_img_p = img_p.replace(lm_ins.fake_types[0], f'aligned_{lm_ins.fake_types[0]}_{cfg.PREPROCESSING.N_LANDMARKS}')
-                cv2.imwrite(os.path.join(lm_ins.image_root, aligned_img_p), rot_img)
+                # cv2.imwrite(os.path.join(lm_ins.image_root, aligned_img_p), rot_img)
+                cv2.imwrite(aligned_img_p, rot_img)
                 img_paths[i] = aligned_img_p
         
         print('All landmarks have been detected and stored in memory!')
@@ -284,7 +293,8 @@ if __name__ == '__main__':
             data = lm_ins.build_data(img_paths, file_names)
         
         try:
-            lm_ins.save2json(data, fn=f'{lm_ins.split}_{lm_ins.dataset}_{lm_ins.fake_types[0]}_{cfg.PREPROCESSING.N_LANDMARKS}.json')
+            # lm_ins.save2json(data, fn=f'{lm_ins.split}_{lm_ins.dataset}_{lm_ins.fake_types[0]}_{cfg.PREPROCESSING.N_LANDMARKS}.json')
+            lm_ins.save2json(data, fn=f'{lm_ins.split}_{cfg.PREPROCESSING.N_LANDMARKS}_{lm_ins.dataset}_{lm_ins.fake_types[0]}.json')
         except Exception as e:
             print(e)
         print("Processed Data has been saved successfully!")

@@ -28,7 +28,14 @@ def preset_model(cfg, model, optimizer=None):
                                                    lr_step=cfg.TRAIN.lr_scheduler.milestones,
                                                    gamma=cfg.TRAIN.lr_scheduler.gamma)
     else:
-        model.init_weights(**cfg.MODEL.INIT_WEIGHTS)
+        # model.init_weights(**cfg.MODEL.INIT_WEIGHTS)
+        if hasattr(model, 'module'):
+        # 在使用 DataParallel 时，模型会封装在 model.module 中
+            model.module.init_weights(**cfg.MODEL.INIT_WEIGHTS)
+        else:
+        # 如果没有封装成 DataParallel，直接调用 init_weights
+            model.init_weights(**cfg.MODEL.INIT_WEIGHTS)
+
     print('Loading model successfully -- {}'.format(cfg.MODEL.type))
     
     #Freeze backbone if begin_epoch < warm up

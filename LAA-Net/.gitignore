@@ -1,2 +1,6 @@
 data/
 retinaface/
+processed_data/
+logs/
+.vscode/
+.tensorboard/

@@ -1,7 +1,8 @@
 #-*- coding: utf-8 -*-
 import os
 import sys
-import simplejson as json
+# import simplejson as json
+import json
 import math
 import random
 
@@ -76,7 +77,8 @@ class CommonDataset(Dataset, ABC):
                 
                 # Custom base on the specific data structure
                 if not 'label' in item.keys():
-                    lb = (('fake' in image_path) or (('original' not in image_path) and ('aligned' not in image_path)))
+                    # lb = (('fake' in image_path) or (('Original' not in image_path) and ('aligned' not in image_path)))
+                    lb = (('fake' in image_path) or ('Original' not in image_path))
                 else:
                     lb = (item.label == 'fake')
                 lb_encoded = int(lb)
@@ -84,8 +86,8 @@ class CommonDataset(Dataset, ABC):
                 
                 if PREFIX_PATH in item.image_path:
                     image_path = item.image_path.replace(PREFIX_PATH, self._cfg.DATA[self.split.upper()].ROOT)
-                else:
-                    image_path = os.path.join(self._cfg.DATA[self.split.upper()].ROOT, item.image_path)
+                # else:
+                    # image_path = os.path.join(self._cfg.DATA[self.split.upper()].ROOT, item.image_path)
                 image_paths.append(image_path)
 
                 # Appending more data properties for data loader
