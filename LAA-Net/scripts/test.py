@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+#-*- coding: utf-8 -*- python scripts/test.py --cfg configs/efn4_fpn_sbi_adv.yaml -i samples/debugs/affine_f_2883.jpg
 import os
 import sys
 import time
@@ -14,6 +14,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import numpy as np
+import csv
 
 from package_utils.transform import (
     final_transform,
@@ -84,7 +85,7 @@ if __name__=='__main__':
         model = model.cuda()
     
     # Define essential variables
-    image = args.image
+    imagedir = args.image
     test_file = cfg.TEST.test_file
     video_level = cfg.TEST.video_level
     aspect_ratio = cfg.DATASET.IMAGE_SIZE[1]*1.0 / cfg.DATASET.IMAGE_SIZE[0]
@@ -94,37 +95,66 @@ if __name__=='__main__':
     metrics_base = cfg.METRICS_BASE
     acc_measure = get_acc_mesure_func(metrics_base)
     
-    model.eval()
-    if image is not None and task == 'test_img':
-        img = load_image(image)
-        img = cv2.resize(img, (317, 317))
-        img = img[60:(317), 30:(287), :]
-        c, s = get_center_scale(img.shape[:2], aspect_ratio, pixel_std)
-        trans = get_affine_transform(c, s, rot, cfg.DATASET.IMAGE_SIZE)
-        input = cv2.warpAffine(img,
-                               trans,
-                               (int(cfg.DATASET.IMAGE_SIZE[0]), int(cfg.DATASET.IMAGE_SIZE[1])),
-                               flags=cv2.INTER_LINEAR,
-                              )
-        with torch.no_grad():
-            st = time.time()
-            img_trans = transforms(input/255).to(torch.float64)
-            img_trans = torch.unsqueeze(img_trans, 0)
-            if device_count > 0:
-                img_trans = img_trans.cuda(non_blocking=True)
+    model.eval()    
+    
+    if imagedir is not None and task == 'test_img':
+        result_dir = 'result'
+        heatmap_dir = os.path.join(result_dir, 'heatmap')
+        if not os.path.exists(result_dir):
+            os.makedirs(result_dir)
+        if not os.path.exists(heatmap_dir):
+            os.makedirs(heatmap_dir)
+        csv_file_path = os.path.join(result_dir, 'cla_pre_1.csv')
+
+        with open(csv_file_path, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            # Write the header
+            writer.writerow(['id', 'label', 'confidence'])
             
-            outputs = model(img_trans)
-            hm_outputs = outputs[0]['hm']
-            cls_outputs = outputs[0]['cls']
-            hm_preds = _sigmoid(hm_outputs).cpu().numpy()
-            if cfg.TEST.vis_hm:
-                print(f'Heatmap max value --- {hm_preds.max()}')
-                vis_heatmap(img, hm_preds[0], 'output_pred.jpg')
-            label_pred = cls_outputs.cpu().numpy()
-            label = 'Fake' if label_pred[0][-1] > cfg.TEST.threshold else 'Real'
-            logger.info('Inferencing time --- {}'.format(time.time() - st))
-            logger.info('{} --- {}'.format(label, label_pred[0][-1]))
-            logger.info('-----------------***--------------------')
+            for id in os.listdir(imagedir):
+                imagedir_f = os.path.join(imagedir, id)
+                
+                for image_name in os.listdir(imagedir_f):
+                    image_path = os.path.join(imagedir_f, image_name)
+                    img = cv2.imread(image_path)
+                    if img is None:
+                        writer.writerow([image_name.split('.')[0], 0, 0])
+                        continue
+                        # img = np.random.randint(0, 256, (317, 317, 3), dtype=np.uint8)
+                    if len(img.shape) == 2:  # Check if the image is grayscale
+                        img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)  # Convert grayscale to BGR
+                    elif img.shape[2] == 4:  # Check if the image has an alpha channel
+                        img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)  # Convert BGRA to BGR
+    
+                    img = cv2.resize(img, (317, 317))
+                    img = img[60:(317), 30:(287), :]
+                    c, s = get_center_scale(img.shape[:2], aspect_ratio, pixel_std)
+                    trans = get_affine_transform(c, s, rot, cfg.DATASET.IMAGE_SIZE)
+                    input = cv2.warpAffine(img,
+                                           trans,
+                                           (int(cfg.DATASET.IMAGE_SIZE[0]), int(cfg.DATASET.IMAGE_SIZE[1])),
+                                           flags=cv2.INTER_LINEAR,
+                                          )
+                    with torch.no_grad():
+                        st = time.time()
+                        img_trans = transforms(input/255).to(torch.float64)
+                        img_trans = torch.unsqueeze(img_trans, 0)
+                        if device_count > 0:
+                            img_trans = img_trans.cuda(non_blocking=True)
+    
+                        outputs = model(img_trans)
+                        hm_outputs = outputs[0]['hm']
+                        cls_outputs = outputs[0]['cls']
+                        hm_preds = _sigmoid(hm_outputs).cpu().numpy()
+                        if cfg.TEST.vis_hm:
+                            # print(f'Heatmap max value --- {hm_preds.max()}')
+                            vis_heatmap(img, hm_preds[0], os.path.join(heatmap_dir, image_name))
+                        label_pred = cls_outputs.cpu().numpy()
+                        label = 1 if label_pred[0][-1] > cfg.TEST.threshold else 0 # 1:fake 0:real
+                        confidence = label_pred[0][-1]
+                        # logger.info('{} --- {}'.format(label, confidence))
+                        writer.writerow([image_name.split('.')[0], label, confidence])
+       
     if task == 'eval':
         logger.info(f'Using metric-base {metrics_base} for evaluation!')
         logger.info(f'Video level evaluation mode: {video_level}')

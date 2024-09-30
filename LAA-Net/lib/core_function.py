@@ -45,6 +45,7 @@ def get_batch_data(batch_data):
     
     return inputs, labels, targets, heatmaps, cstency_heatmaps, offsets
 
+from torch.cuda.amp import GradScaler, autocast
 
 def train(cfg, model, critetion, optimizer, epoch, data_loader, logger, writer, devices, trainIters, metrics_base='combine'):
     calculate_acc = get_acc_mesure_func(metrics_base)
@@ -66,6 +67,7 @@ def train(cfg, model, critetion, optimizer, epoch, data_loader, logger, writer, 
         
         loop = arange(1) if cfg.TRAIN.optimizer != 'SAM' else arange(2)
         for idx in loop:
+            torch.cuda.empty_cache()
             outputs = model(inputs)
             if isinstance(outputs, list):
                 outputs = outputs[0]
@@ -149,6 +151,8 @@ def train(cfg, model, critetion, optimizer, epoch, data_loader, logger, writer, 
         if i % 5 == 0:
             params = {}
             if 'Combined' in cfg.TRAIN.loss.type:
+                if hasattr(critetion, 'hm_lmda') and critetion.dst_hm_cls_lmda > 0:
+                    params['loss_hm']=loss_['hm'].item()
                 if hasattr(critetion, 'dst_hm_cls_lmda') and critetion.dst_hm_cls_lmda > 0:
                     params['loss_dst']=loss_['dst_hm_cls'].item()
                 if hasattr(critetion, 'offset_lmda') and critetion.offset_lmda > 0:
@@ -175,6 +179,7 @@ def train(cfg, model, critetion, optimizer, epoch, data_loader, logger, writer, 
                 writer.add_scalar('Train/loss_offset', loss_['offset'].item(), trainIters)
             if 'cstency' in loss_.keys():
                 writer.add_scalar('Train/loss_cstency', loss_['cstency'].item(), trainIters)
+        del inputs,outputs,loss
     return losses, acc, trainIters
 
 

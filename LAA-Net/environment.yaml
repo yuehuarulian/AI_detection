@@ -215,6 +215,7 @@ dependencies:
   - zfp=1.0.0=h6a678d5_0
   - zlib=1.2.13=h4ab18f5_6
   - zstd=1.5.5=hc292b87_2
+  # python -m pip install opencv-python  opencv-python-headless scikit-image scikit-learn albumentations
   # - pip:
   #     - albucore==0.0.15
   #     - albumentations==1.4.15
