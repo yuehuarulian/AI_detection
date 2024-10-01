@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-  python scripts/train.py --cfg configs/efn4_fpn_sbi_adv.yaml
 from __future__ import absolute_import
 import time
 
@@ -35,6 +35,8 @@ def args_parser(args=None):
 
 
 if __name__=='__main__':
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
     if len(sys.argv[1:]):
         args = sys.argv[1:]
     else:
@@ -54,17 +56,34 @@ if __name__=='__main__':
     # Allocate memory
     if args.alloc_mem:
         mem_all_tensors = torch.rand(60,10000,10000)
-        mem_all_tensors.to('cuda:0')
+        mem_all_tensors.to(f'cuda:{cfg.TRAIN.gpus[0]}')
 
     #Configuing GPU devices
     devices = torch.device('cpu')
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
     
-    if 'gpus' in cfg.TRAIN.gpus and cfg.TRAIN.gpus is not None:
-        #Only support a single gpu for training now
-        devices = torch.device('cuda:1')
-    model = build_model(cfg.MODEL, MODELS).cuda().to(torch.float64)
+    # if 'gpus' in cfg.TRAIN.gpus and cfg.TRAIN.gpus is not None:
+    #     #Only support a single gpu for training now
+    #     devices = torch.device('cuda:1')
+
+    # model = build_model(cfg.MODEL, MODELS).cuda().to(torch.float64)
+
+    print(torch.cuda.is_available())
+    # 确定主设备
+    if 'gpus' in cfg.TRAIN and cfg.TRAIN.gpus is not None:
+        print(cfg.TRAIN.gpus[0])
+        devices = torch.device(f'cuda:{cfg.TRAIN.gpus[0]}')
+    else:
+        devices = torch.device('cuda:0')  # 默认主设备
+    
+    # 初始化模型并移动到主设备
+    # model = build_model(cfg.MODEL, MODELS).to(torch.float64)
+    model = build_model(cfg.MODEL, MODELS).to(torch.float64).to(devices)
+    
+    # 使用 DataParallel 来支持多GPU训练
+    if len(cfg.TRAIN.gpus) > 1:
+        model = torch.nn.DataParallel(model, device_ids=cfg.TRAIN.gpus)
     
     #Loading Dataloader
     start_loading = time.time()
@@ -116,10 +135,10 @@ if __name__=='__main__':
         
     #Loading model
     model, optimizer, start_epoch = preset_model(cfg, model, optimizer=optimizer)
-    if len(cfg.TRAIN.gpus) > 0:
-        model = nn.DataParallel(model, device_ids=cfg.TRAIN.gpus).cuda().to(torch.float64)
-    else:
-        model = model.cuda().to(torch.float64)
+    # if len(cfg.TRAIN.gpus) > 0:
+    #     model = nn.DataParallel(model, device_ids=cfg.TRAIN.gpus).cuda().to(torch.float64)
+    # else:
+    #     model = model.cuda().to(torch.float64)
     
     #Learning rate Scheduler
     if cfg.TRAIN.lr_scheduler == 'MultiStepLR':
@@ -140,6 +159,7 @@ if __name__=='__main__':
     #Starting training process
     logger.info('Starting training process...')
     for epoch in range(start_epoch, cfg.TRAIN.epochs):
+        # torch.cuda.empty_cache()
         #Unfreezin backbone to update weights
         if cfg.TRAIN.freeze_backbone and epoch == cfg.TRAIN.warm_up:
             unfreeze_backbone(model)
@@ -186,4 +206,6 @@ if __name__=='__main__':
                 min_val_loss = loss_val.avg
                 max_val_acc = acc_val.avg
                 logger.info(f'Saved best model at epoch --- {epoch}')
+            ckp_path = os.path.join(LOG_DIR, '{}_{}_model_last.pth'.format(cfg.MODEL.type, cfg.TASK))
+            save_model(path=ckp_path, epoch=epoch, model=model, optimizer=optimizer)
         lr_scheduler.step()

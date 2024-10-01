@@ -45,7 +45,7 @@ def get_batch_data(batch_data):
     
     return inputs, labels, targets, heatmaps, cstency_heatmaps, offsets
 
-from torch.cuda.amp import GradScaler, autocast
+# from torch.cuda.amp import GradScaler, autocast
 
 def train(cfg, model, critetion, optimizer, epoch, data_loader, logger, writer, devices, trainIters, metrics_base='combine'):
     calculate_acc = get_acc_mesure_func(metrics_base)
@@ -124,7 +124,21 @@ def train(cfg, model, critetion, optimizer, epoch, data_loader, logger, writer, 
                     optimizer.first_step(zero_grad=True)
                 else:
                     optimizer.second_step(zero_grad=True)
-                    
+
+            # # loss 需要除以累积步数
+            # loss = loss / accumulation_steps
+            # loss.backward()  # 累积梯度
+            
+            # if (i + 1) % accumulation_steps == 0 or (i + 1) == len(data_loader):
+            #     if cfg.TRAIN.optimizer != 'SAM':
+            #         optimizer.step()
+            #     else:
+            #         if idx == 0:
+            #             optimizer.first_step(zero_grad=True)
+            #         else:
+            #             optimizer.second_step(zero_grad=True)
+            #     optimizer.zero_grad()  # 每次更新后清空梯度
+
         if cfg.TRAIN.debug.active:
             debugging_panel(cfg.TRAIN.debug, inputs, heatmaps, first_outputs_hm, i, batch_cls_pred=first_outputs_cls)
         
