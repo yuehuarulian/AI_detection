@@ -1,7 +1,7 @@
 PREPROCESSING:
   DATASET: FaceForensics
   SPLIT: train
-  ROOT: /data/deepfake_cluster/datasets_df/FaceForensics++/c23/
+  ROOT: /data/FaceForensics++/c23/
   FAKETYPE: [Deepfakes, Face2Face, FaceSwap, NeuralTextures]
   IMAGE_SUFFIX: jpg
   DATA_TYPE: images

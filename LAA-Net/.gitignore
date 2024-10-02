@@ -1,2 +1,6 @@
 data/
 retinaface/
+.vscode/
+processed_data/
+result/
+logs/

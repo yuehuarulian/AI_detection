@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 import os
-import simplejson as json
+import json
 
 import cv2
 import numpy as np

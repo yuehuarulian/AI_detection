@@ -7,10 +7,11 @@ from .dfdcp import DFDCP
 from .dfdc import DFDC
 from .dfd import DFD
 from .dfw import DFW
+from .my_dataset import my_dataset
 
 
 @DATASETS.register_module()
-class MasterDataset(CDFV1, FF, DFDCP, CDFV2, DFDC, DFD, DFW):
+class MasterDataset(CDFV1, FF, DFDCP, CDFV2, DFDC, DFD, DFW, my_dataset):
     def __init__(self, cfg, **kwargs):
         super().__init__(cfg, **kwargs)
     
@@ -30,5 +31,7 @@ class MasterDataset(CDFV1, FF, DFDCP, CDFV2, DFDC, DFD, DFW):
             return MasterDataset.__mro__[6]._load_from_path(self, split=split)
         elif self.dataset == 'DFW':
             return MasterDataset.__mro__[7]._load_from_path(self, split=split)
+        elif self.dataset == 'mydataset':
+            return MasterDataset.__mro__[8]._load_from_path(self, split=split)
         else:
             return NotImplementedError(f'{self.dataset} has not been supported yet!')

@@ -80,6 +80,8 @@ Results on [FF++](https://github.com/ondyari/FaceForensics) in-dataset evaluatio
             -c {compression} \
             -n {num_frames} \
             -t {task}
+
+            python package_utils/images_crop.py -d NeuralTextures -c c23 -t test
             ```
             (*This script can also be utilized for cropping faces in other datasets such as [CDF](https://github.com/yuezunli/celeb-deepfakeforensics), [DFD](https://blog.research.google/2019/09/contributing-data-to-deepfake-detection.html), [DFDC](https://ai.meta.com/datasets/dfdc/) for cross-evaluation test. You do not need to run crop for [DFW](https://github.com/deepfakeinthewild/deepfake-in-the-wild) as the data is already preprocessed*).
             
@@ -134,9 +136,11 @@ Results on [FF++](https://github.com/ondyari/FaceForensics) in-dataset evaluatio
             ```
             python package_utils/geo_landmarks_extraction.py \
             --config configs/data_preprocessing_c0.yaml \
-            --extract_landmarks \
+            --extract_landmark \
             --save_aligned
             ```
+            python package_utils/geo_landmarks_extraction.py --config configs/data_preprocessing_c0.yaml --extract_landmark --save_aligned
+
         4. (Optional) Finally, if using BI synthesis, for the online pseudo-fake generation scheme, 30 similar landmarks are searched for each facial query image beforehand.
             ```
             python package_utils/bi_online_generation.py \

@@ -15,7 +15,7 @@ from retinaface.utils import vis_annotations
 import torch
 
 
-ROOT = '/data/deepfake_cluster/datasets_df'
+ROOT = 'F:/LAA_data'
 SAVE_DIR = f'{ROOT}/FaceForensics++/c0'
 IMAGE_H, IMAGE_W, IMAGE_C = 256, 256, 3
 PADDING = 0.25
@@ -82,11 +82,11 @@ def facecrop(model, org_path, save_path, period=1, num_frames=10, dataset='origi
                     score = faces[face_idx]['score']                    
                     
                     if face_s > face_s_max and score > score_max:
-                        f_c_x0 = max(0, x0 - int(face_w*padding))
-                        f_c_x1 = min(width, x1 + int(face_w*padding))
-                        f_c_y0 = max(0, y0 - int(face_h*padding))
-                        f_c_y1 = min(height, y1 + int(face_h*padding))
-                        
+                        f_c_x0 = int(max(0, x0 - int(face_w*padding)))
+                        f_c_x1 = int(min(width, x1 + int(face_w*padding)))
+                        f_c_y0 = int(max(0, y0 - int(face_h*padding)))
+                        f_c_y1 = int(min(height, y1 + int(face_h*padding)))
+                        # print(f'f_c_x0: {f_c_x0}, f_c_x1: {f_c_x1}, f_c_y0: {f_c_y0}, f_c_y1: {f_c_y1}')
                         face_crop = frame_org[f_c_y0:f_c_y1, f_c_x0:f_c_x1, :]
                         if mask_path is not None:
                             mask_crop = mask_org[f_c_y0:f_c_y1, f_c_x0:f_c_x1, :]
@@ -143,11 +143,13 @@ if __name__=='__main__':
 
     # Setting the dataset path based on the dataset name
     if args.dataset=='Original':
-        dataset_path='{}/FaceForensics++/original_download/original_sequences/youtube/'.format(ROOT)
+        # dataset_path='{}/FaceForensics++/original_download/original_sequences/youtube/'.format(ROOT)
+        dataset_path='{}/FaceForensics++/original_sequences/youtube/'.format(ROOT)
     elif args.dataset=='DeepFakeDetection_original':
         dataset_path='/data/FaceForensics++/original_sequences/actors/{}/'.format(args.comp)
     elif args.dataset in ['DeepFakeDetection','FaceShifter','Face2Face','Deepfakes','FaceSwap','NeuralTextures']:
-        dataset_path='{}/FaceForensics++/original_download/manipulated_sequences/{}/'.format(ROOT, args.dataset)
+        # dataset_path='{}/FaceForensics++/original_download/manipulated_sequences/{}/'.format(ROOT, args.dataset)
+        dataset_path='{}/FaceForensics++/manipulated_sequences/{}/'.format(ROOT, args.dataset)
     elif args.dataset in ['Celeb-real','Celeb-synthesis','YouTube-real']:
         if 'v1' in SAVE_DIR:
             dataset_path='{}/Celeb-DFv1/'.format(ROOT)
@@ -170,7 +172,8 @@ if __name__=='__main__':
         mask_mov_paths = os.path.join(dataset_path, 'masks', 'videos/')
         
         # Annotation file for FF++
-        with open(f'{ROOT}/FaceForensics++/original_download/{args.task}.json') as f:
+        with open(f'{ROOT}/FaceForensics++/{args.task}.json') as f:
+        # with open(f'{ROOT}/FaceForensics++/original_download/{args.task}.json') as f:
             vid_ids = json.load(f)
     elif args.dataset in ['Celeb-real', 'Celeb-synthesis', 'YouTube-real']:
         if 'v1' in SAVE_DIR:

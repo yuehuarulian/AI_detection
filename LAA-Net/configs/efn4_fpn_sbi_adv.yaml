@@ -25,41 +25,50 @@ DATASET:
       TEST: 32
     TRAIN:
       NAME: FF++ # This field to define datasets that can be used to train/in-dataset/cross-dataset evaluation
-      ROOT: /home/users/<user>/data/FaceForensics++/c0/
+      ROOT: ./data/FaceForensics++/c0/
+      # ROOT: /home/users/<user>/data/FaceForensics++/c0/
       # ROOT: /data/deepfake_cluster/datasets_df/FaceForensics++/c0/
       FROM_FILE: True
       FAKETYPE: [Deepfakes, Face2Face, FaceSwap, NeuralTextures]
       # ANNO_FILE: train/frames/FaceXRay/train_FF_FaceXRay.json
-      ANNO_FILE: processed_data/c0/train_81_FF++_processed.json
+      ANNO_FILE: ./processed_data/c0/train_81_FF++_processed.json
       LABEL_FOLDER: [real, fake]
     VAL:
       NAME: FF++ # This field to define datasets that can be used to train/in-dataset/cross-dataset evaluation
-      ROOT: /home/users/<user>/data/FaceForensics++/c0/
+      # ROOT: /home/users/<user>/data/FaceForensics++/c0/
+      ROOT: ./data/FaceForensics++/c0/
       FROM_FILE: True
       FAKETYPE: [Deepfakes, Face2Face, FaceSwap, NeuralTextures] # Choosing Deepfake techniques to be loaded for dataloader
       # ANNO_FILE: val/frames/FaceXRay/val_FF_FaceXRay.json
       ANNO_FILE: processed_data/c0/val_81_FF++_processed.json
       LABEL_FOLDER: [real, fake]
     TEST:
-      NAME: Celeb-DFv1
-      # ROOT: /home/users/<user>/data/FaceForensics++/c0/
-      ROOT: /home/users/<user>/data/Celeb-DFv1/
-      # ROOT: /data/deepfake_cluster/datasets_df/Celeb-DFv1/
-      # ROOT: /home/users/<user>/data/Celeb-DFv2/
-      # ROOT: /home/users/<user>/data/DFDCP/
-      # ROOT: /home/users/<user>/data/DFDC/
-      # ROOT: /home/users/<user>/data/DFD/
-      # ROOT: /home/users/<user>/data/DFW/
+      NAME: mydataset
+      ROOT: F:\
       FROM_FILE: False
-      # FAKETYPE: [original, Deepfakes]
-      # FAKETYPE: [original, Deepfakes, Face2Face, FaceSwap, NeuralTextures]
-      FAKETYPE: [Celeb-real, Celeb-synthesis, YouTube-real]
-      # FAKETYPE: [method_A, method_B, original_videos]
-      # FAKETYPE: [fake, real]
-      # FAKETYPE: [DeepFakeDetection_original, DeepFakeDetection]
-      # FAKETYPE: [fake_test, real_test]
-      ANNO_FILE: FaceXRay/test/test_FF_Xray.json
+      FAKETYPE: [face]
+      # ANNO_FILE: processed_data/c0/test_81_FF++_processed.json
       LABEL_FOLDER: [real, fake]
+
+      # NAME: Celeb-DFv1
+      # ROOT: /home/users/<user>/data/FaceForensics++/c0/
+      # # ROOT: /home/users/<user>/data/Celeb-DFv1/
+      # # ROOT: /data/deepfake_cluster/datasets_df/Celeb-DFv1/
+      # # ROOT: /home/users/<user>/data/Celeb-DFv2/
+      # # ROOT: /home/users/<user>/data/DFDCP/
+      # # ROOT: /home/users/<user>/data/DFDC/
+      # # ROOT: /home/users/<user>/data/DFD/
+      # # ROOT: /home/users/<user>/data/DFW/
+      # FROM_FILE: False
+      # # FAKETYPE: [original, Deepfakes]
+      # FAKETYPE: [original, Deepfakes, Face2Face, FaceSwap, NeuralTextures]
+      # # FAKETYPE: [Celeb-real, Celeb-synthesis, YouTube-real]
+      # # FAKETYPE: [method_A, method_B, original_videos]
+      # # FAKETYPE: [fake, real]
+      # # FAKETYPE: [DeepFakeDetection_original, DeepFakeDetection]
+      # # FAKETYPE: [fake_test, real_test]
+      # ANNO_FILE: FaceXRay/test/test_FF_Xray.json
+      # LABEL_FOLDER: [real, fake]
   TRANSFORM:
     geometry:
       type: GeometryTransform
@@ -127,8 +136,8 @@ TRAIN:
     ce_reduction: mean
   optimizer: SAM
   distributed: False
-  pretrained: 'logs/11-07-2023/PoseEfficientNet_EFN_hm100_EFPN_NoBasedCLS_Focal_C3_256Cst100_8FXRayv2_SAM(Adam)_ADV_Era1_OutSigmoid_5e5_model_best.pth'
-  tensorboard: False
+  pretrained: 'logs\31-09-2024\PoseEfficientNet_EFN_hm100_EFPN_NoBasedCLS_Focal_C3_256Cst100_8FXRayv2_SAM(Adam)_ADV_Era1_OutSigmoid_5e5_lblsm035_model_last.pth'
+  tensorboard: True
   resume: True
   lr_scheduler:
     # type: MultiStepLR
@@ -141,13 +150,14 @@ TRAIN:
     save_hm_pred: True
 TEST:
   gpus: [0]
-  subtask: 'eval'
+  # subtask: 'eval'
+  subtask: 'test_img'
   test_file: ''
-  vis_hm: True
-  threshold: 0.5
+  vis_hm: False
+  threshold: 1.0
   flip_test: True
-  video_level: True
-  pretrained: 'pretrained/PoseEfficientNet_EFN_hm100_EFPN_NoBasedCLS_Focal_C3_256Cst100_8FXRayv2_SAM(Adam)_ADV_Era1_OutSigmoid_5e5_model_best.pth'
+  video_level: False
+  pretrained: 'logs\31-09-2024\PoseEfficientNet_EFN_hm100_EFPN_NoBasedCLS_Focal_C3_256Cst100_8FXRayv2_SAM(Adam)_ADV_Era1_OutSigmoid_5e5_lblsm035_model_last.pth'
 PREPROCESSING:
   DATASET: FaceForensics
   SPLIT: train
