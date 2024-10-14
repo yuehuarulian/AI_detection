@@ -13,7 +13,8 @@ from networks.trainer import Trainer
 from options.train_options import TrainOptions
 from options.test_options import TestOptions
 from util import Logger
-# python train.py --name 1class-resnet-phase --dataroot ../Grad_data_paper --classes phase --batch_size 16 --delr_freq 20 --lr 0.0005 --niter 300 --epoch 100
+# python train.py --name debug --dataroot ../Grad_data_paper --classes phase --batch_size 16 --delr_freq 20 --lr 0.0005 --niter 300
+# python train.py --name 7class-resnet --dataroot ../Grad_data_paper --classes 100k-faces,A_data,car,cat,chair,horse,phase --batch_size 32 --delr_freq 10 --lr 0.0005 --niter 100 --gpu_id=0
 
 # test config
 vals = ['biggan', 'stargan', 'gaugan', 'deepfake', 'phase']

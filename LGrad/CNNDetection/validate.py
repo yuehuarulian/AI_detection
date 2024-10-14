@@ -37,7 +37,7 @@ def my_validate(model, opt):
             img_names.extend(img_name)
 
     y_pred = np.array(y_pred)
-    return y_pred > 0.3, y_pred, img_names
+    return y_pred > 0.05, y_pred, img_names
 
 if __name__ == '__main__':
     opt = TestOptions().parse(print_options=False)

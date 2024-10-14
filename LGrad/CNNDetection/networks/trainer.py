@@ -20,6 +20,13 @@ class Trainer(BaseModel):
         if not self.isTrain or opt.continue_train:
             self.model = resnet50(num_classes=1)
 
+        # 将模型放置到指定的设备上
+        self.model.to(self.device)
+
+        # 如果使用多个 GPU，使用 DataParallel 来包装模型
+        if len(opt.gpu_ids) > 1:
+            self.model = nn.DataParallel(self.model, device_ids=opt.gpu_ids)
+
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()
             # initialize optimizers

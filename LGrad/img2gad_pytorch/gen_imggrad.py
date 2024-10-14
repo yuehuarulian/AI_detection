@@ -54,7 +54,7 @@ def generate_images():
         label_size=0,
         # minibatch_std_group_size = 1,
         image_channels=3)
-    model.load_state_dict(torch.load(modelpath), strict=True)
+    model.load_state_dict(torch.load(modelpath, weights_only=True), strict=True)
 
     model.cuda()
     model.eval()

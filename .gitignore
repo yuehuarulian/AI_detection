@@ -8,3 +8,4 @@ checkpoints/
 *.pth
 binary_deepfake_detection/
 UniversalFakeDetect/
+.vscode/
