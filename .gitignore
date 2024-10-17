@@ -1,0 +1,9 @@
+*.dat
+*.log
+*.csv
+*.pth
+*.pyc
+pretrained/
+logs/
+datasets/
+training/dataset/__pycache__/

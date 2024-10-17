@@ -487,8 +487,9 @@ if __name__ == '__main__':
         sub_dataset_names = ['fake', 'real']
         sub_dataset_paths = [Path(os.path.join(dataset_path, name)) for name in sub_dataset_names]
     else:
-        raise ValueError(f"Dataset {dataset_name} not recognized")
-    
+        sub_dataset_names = ['1_fake', '0_real']
+        sub_dataset_paths = [Path(os.path.join(dataset_path, name)) for name in sub_dataset_names]
+
     # Check if dataset path exists
     if not Path(dataset_path).exists():
         logger.error(f"Dataset path does not exist: {dataset_path}")

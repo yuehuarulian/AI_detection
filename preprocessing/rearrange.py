@@ -490,6 +490,33 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                         dataset_dict[dataset_name][label]['train'][video_name] = {'label': label, 'frames': frame_paths}
                         dataset_dict[dataset_name][label]['test'][video_name] = {'label': label, 'frames': frame_paths}
                         dataset_dict[dataset_name][label]['val'][video_name] = {'label': label, 'frames': frame_paths}
+# mydata
+    else:
+        dataset_path = os.path.join(dataset_root_path, dataset_name)
+        dataset_dict[dataset_name] = {f'{dataset_name}_Real': {'train': {}, 'test': {}, 'val': {}},
+                                f'{dataset_name}_Fake': {'train': {}, 'test': {}, 'val': {}}}
+        for index, folder in enumerate(os.scandir(dataset_path)):
+            if not os.path.isdir(folder):
+                continue
+            elif folder.name in ['fake']:
+                for video_path in os.scandir(os.path.join(dataset_path, folder.name, 'frames')):
+                    if video_path.is_dir():
+                        video_name = video_path.name
+                        label = f'{dataset_name}_Fake'
+                        frame_paths = [os.path.join(video_path, frame.name) for frame in os.scandir(video_path)]
+                        dataset_dict[dataset_name][label]['train'][video_name] = {'label': label, 'frames': frame_paths}
+                        dataset_dict[dataset_name][label]['test'][video_name] = {'label': label, 'frames': frame_paths}
+                        dataset_dict[dataset_name][label]['val'][video_name] = {'label': label, 'frames': frame_paths}
+            elif folder.name in ['real']:
+                for video_path in os.scandir(os.path.join(dataset_path, folder.name, 'frames')):
+                    if video_path.is_dir():
+                        video_name = video_path.name
+                        label = f'{dataset_name}_Real'
+                        frame_paths = [os.path.join(video_path, frame.name) for frame in os.scandir(video_path)]
+                        dataset_dict[dataset_name][label]['train'][video_name] = {'label': label, 'frames': frame_paths}
+                        dataset_dict[dataset_name][label]['test'][video_name] = {'label': label, 'frames': frame_paths}
+                        dataset_dict[dataset_name][label]['val'][video_name] = {'label': label, 'frames': frame_paths}
+
 
     # Convert the dataset dictionary to JSON format and save to file
     output_file_path = os.path.join(output_file_path, dataset_name + '.json')

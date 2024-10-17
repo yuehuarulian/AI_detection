@@ -1,0 +1,3 @@
+pip install dlib PyYAML imutils scikit-image scikit-learn fvcore efficientnet_pytorch kornia timm loralib transformers einops albumentations lmdb
+
+conda install pandas tensorboard matplotlib imgaugy
