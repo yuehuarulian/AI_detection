@@ -5,19 +5,19 @@
                 "0": {
                     "label": "debug_train_Real",
                     "frames": [
-                        "./datasets\\debug_train\\real\\frames\\0\\00AIeZUzvJGq2jYj.jpeg"
+                        "./datasets/debug_train/real/frames/0/00AIeZUzvJGq2jYj.jpeg"
                     ]
                 },
                 "1": {
                     "label": "debug_train_Real",
                     "frames": [
-                        "./datasets\\debug_train\\real\\frames\\1\\00e5DL0pet4gbW90.jpeg"
+                        "./datasets/debug_train/real/frames/1/00e5DL0pet4gbW90.jpeg"
                     ]
                 },
                 "10": {
                     "label": "debug_train_Real",
                     "frames": [
-                        "./datasets\\debug_train\\real\\frames\\10\\01J8XEDDAo1eB7FL.jpeg"
+                        "./datasets/debug_train/real/frames/10/01J8XEDDAo1eB7FL.jpeg"
                     ]
                 }
             }
@@ -27,19 +27,19 @@
                 "0": {
                     "label": "debug_train_Fake",
                     "frames": [
-                        "./datasets\\debug_train\\fake\\frames\\0\\00jWHicjo7ON46M1.jpg"
+                        "./datasets/debug_train/fake/frames/0/00jWHicjo7ON46M1.jpg"
                     ]
                 },
                 "1": {
                     "label": "debug_train_Fake",
                     "frames": [
-                        "./datasets\\debug_train\\fake\\frames\\1\\03G4JSrRcujJ9wPS.jpg"
+                        "./datasets/debug_train/fake/frames/1/03G4JSrRcujJ9wPS.jpg"
                     ]
                 },
                 "10": {
                     "label": "debug_train_Fake",
                     "frames": [
-                        "./datasets\\debug_train\\fake\\frames\\10\\0biUYINavPjnFX2F.jpg"
+                        "./datasets/debug_train/fake/frames/10/0biUYINavPjnFX2F.jpg"
                     ]
                 }
             },
@@ -47,19 +47,19 @@
                 "0": {
                     "label": "debug_train_Fake",
                     "frames": [
-                        "./datasets\\debug_train\\fake\\frames\\0\\00jWHicjo7ON46M1.jpg"
+                        "./datasets/debug_train/fake/frames/0/00jWHicjo7ON46M1.jpg"
                     ]
                 },
                 "1": {
                     "label": "debug_train_Fake",
                     "frames": [
-                        "./datasets\\debug_train\\fake\\frames\\1\\03G4JSrRcujJ9wPS.jpg"
+                        "./datasets/debug_train/fake/frames/1/03G4JSrRcujJ9wPS.jpg"
                     ]
                 },
                 "10": {
                     "label": "debug_train_Fake",
                     "frames": [
-                        "./datasets\\debug_train\\fake\\frames\\10\\0biUYINavPjnFX2F.jpg"
+                        "./datasets/debug_train/fake/frames/10/0biUYINavPjnFX2F.jpg"
                     ]
                 }
             }

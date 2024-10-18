@@ -64,8 +64,7 @@ class DeepfakeAbstractBaseDataset(data.Dataset):
         # Check if 'video_mode' exists in config, otherwise set video_level to False
         self.video_level = config.get('video_mode', False)
         self.clip_size = config.get('clip_size', None)
-        # self.lmdb = config.get('lmdb', False)
-        self.lmdb = False
+        self.lmdb = config.get('lmdb', False)
         # Dataset dictionary
         self.image_list = []
         self.label_list = []
