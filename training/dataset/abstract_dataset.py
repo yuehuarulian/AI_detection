@@ -298,9 +298,9 @@ class DeepfakeAbstractBaseDataset(data.Dataset):
             if not file_path[0] == '.':
                 file_path =  f'./{self.config["rgb_dir"]}\\'+file_path
             assert os.path.exists(file_path), f"{file_path} does not exist"
-            img = cv2.imread(file_path)
-            if img is None:
-                raise ValueError('Loaded image is None: {}'.format(file_path))
+            # img = cv2.imread(file_path)
+            img = Image.open(file_path).convert('RGB')  # 转换为 RGB 格式
+            img = np.array(img)  # 将 PIL 图像转换为 numpy 数组
         elif self.lmdb:
             with self.env.begin(write=False) as txn:
                 # transfer the path format from rgb-path to lmdb-key
@@ -310,7 +310,7 @@ class DeepfakeAbstractBaseDataset(data.Dataset):
                 image_bin = txn.get(file_path.encode())
                 image_buf = np.frombuffer(image_bin, dtype=np.uint8)
                 img = cv2.imdecode(image_buf, cv2.IMREAD_COLOR)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, (size, size), interpolation=cv2.INTER_CUBIC)
         return Image.fromarray(np.array(img, dtype=np.uint8))
 
