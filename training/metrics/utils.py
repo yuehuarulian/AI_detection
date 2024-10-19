@@ -1,5 +1,6 @@
 from sklearn import metrics
 import numpy as np
+import csv
 
 
 def parse_metric_for_print(metric_dict):
@@ -81,6 +82,17 @@ def get_test_metrics(y_pred, y_true, img_names):
     ap = metrics.average_precision_score(y_true, y_pred)
     # acc
     prediction_class = (y_pred > 0.5).astype(int)
+
+    # save the prediction to csv
+    csv_data = []
+    for name, pred_class, confidence in zip(img_names, prediction_class, y_pred):
+        name = name.replace('\\', '/')
+        csv_data.append([name.split('/')[-1].split('.')[0], pred_class, confidence])
+
+    with open('output.csv', 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow(['name', 'label', 'confidence'])
+        csv_writer.writerows(csv_data)
     correct = (prediction_class == np.clip(y_true, a_min=0, a_max=1)).sum().item()
     acc = correct / len(prediction_class)
     # if type(img_names[0]) is not list:
