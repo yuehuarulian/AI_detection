@@ -18,7 +18,7 @@ backbone_config:
 
 # dataset
 all_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT, FaceShifter, DeepFakeDetection, Celeb-DF-v1, Celeb-DF-v2, DFDCP, DFDC, DeeperForensics-1.0, UADFV]
-train_dataset: [A_data,]
+train_dataset: [web]
 test_dataset: [B_data,]
 dataset_type: pair
 # all_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT, FaceShifter, DeepFakeDetection, Celeb-DF-v1, Celeb-DF-v2, DFDCP, DFDC, DeeperForensics-1.0, UADFV]
@@ -88,6 +88,15 @@ label_dict:
   # debug_test
   debug_test_Fake: 1
   debug_test_Real: 0
+  # my_data
+  my_data_Fake: 1
+  my_data_Real: 0
+  # whichfacecisreal
+  whichfaceisreal_Fake: 1
+  whichfaceisreal_Real: 0
+  # web
+  web_Fake: 1
+  web_Real: 0
 
 
 
@@ -118,7 +127,7 @@ optimizer:
     beta1: 0.9  # beta1 for Adam optimizer
     beta2: 0.999 # beta2 for Adam optimizer
     eps: 0.00000001  # epsilon for Adam optimizer
-    weight_decay: 0.0005  # weight decay for regularization
+    weight_decay: 0.005  # weight decay for regularization
     amsgrad: false
   sgd:
     lr: 0.0002  # learning rate
@@ -144,7 +153,7 @@ loss_func:
 losstype: null
 
 # metric
-metric_scoring: auc   # metric for evaluation (auc, acc, eer, ap)
+metric_scoring: acc   # metric for evaluation (auc, acc, eer, ap)
 
 # cuda
 

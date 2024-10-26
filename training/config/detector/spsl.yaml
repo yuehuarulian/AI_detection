@@ -2,7 +2,7 @@
 log_dir: /mntcephfs/lab_data/zhiyuanyan/benchmark_results/logs_final/spsl_4frames
 
 # model setting
-pretrained: /data/home/zhiyuanyan/DeepfakeBench/training/pretrained/xception-b5690688.pth   # path to a pre-trained model, if using one
+pretrained: ./pretrained/xception-b5690688.pth   # path to a pre-trained model, if using one
 # pretrained: /home/tianshuoge/resnet34-b627a593.pth   # path to a pre-trained model, if using one
 model_name: spsl   # model name
 backbone_name: xception  # backbone name
@@ -16,20 +16,20 @@ backbone_config:
 
 # dataset
 all_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT, FaceShifter, DeepFakeDetection, Celeb-DF-v1, Celeb-DF-v2, DFDCP, DFDC, DeeperForensics-1.0, UADFV]
-train_dataset: [FF-FS]
-test_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT]
+train_dataset: [A_data, web, phase, whichfaceisreal]
+test_dataset: [B_data,]
 
 compression: c23  # compression-level for videos
 train_batchSize: 32   # training batch size
 test_batchSize: 32   # test batch size
 workers: 8   # number of data loading workers
-frame_num: {'train': 4, 'test': 32}   # number of frames to use per video in training and testing
+frame_num: {'train': 1, 'test': 1}   # number of frames to use per video in training and testing
 resolution: 256   # resolution of output image to network
 with_mask: false   # whether to include mask information in the input
 with_landmark: false   # whether to include facial landmark information in the input
 save_ckpt: true   # whether to save checkpoint
 save_feat: true   # whether to save features
-
+task_target: None
 
 # data augmentation
 use_data_augmentation: true  # Add this flag to enable/disable data augmentation
@@ -80,7 +80,7 @@ loss_func: cross_entropy   # loss function to use
 losstype: null
 
 # metric
-metric_scoring: auc   # metric for evaluation (auc, acc, eer, ap)
+metric_scoring: acc   # metric for evaluation (auc, acc, eer, ap)
 
 # cuda
 
