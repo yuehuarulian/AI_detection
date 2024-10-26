@@ -11,7 +11,7 @@ from sklearn import metrics
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, roc_auc_score, roc_curve, auc, precision_recall_curve, average_precision_score
 
 # collect path for each detector
-available_list = ['srm', 'xception', 'f3net', 'ucf', 'cnn_aug', 'spsl', 'efficientnetb4', 'capsule', 'meso4', 'recce', 'meso4Inception', 'ffd', 'core', 'fwa', 'facexray']
+available_list = ['srm', 'xception', 'f3net', 'ucf', 'ylw', 'cnn_aug', 'spsl', 'efficientnetb4', 'capsule', 'meso4', 'recce', 'meso4Inception', 'ffd', 'core', 'fwa', 'facexray']
 data_list = ['/mntcephfs/lab_data/zhiyuanyan/benchmark_results/auc_draw', '/mntcephfs/lab_data/yuanxinhang/benchmark_results/auc_draw', '/mntcephfs/lab_data/tianshuoge/benchmark_results/auc_draw']
 detector_list = []
 for data in data_list:

@@ -129,7 +129,7 @@ def plot_radar_chart(df, methods):
 
 # Read and process the AUC values
 base_dir = 'architecture_explore'
-methods = ['core', 'spsl', 'ucf', 'facexray']
+methods = ['core', 'spsl', 'ucf', 'ylw', 'facexray']
 arch_mapping = {
     'core_eff': 'EfficientNet', 'core_res': 'ResNet', 'core_xcep': 'Xception',
     'spsl_eff': 'EfficientNet', 'spsl_res': 'ResNet', 'spsl_xcep': 'Xception',

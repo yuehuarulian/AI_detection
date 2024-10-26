@@ -21,6 +21,7 @@ from .core_detector import CoreDetector
 from .capsule_net_detector import CapsuleNetDetector
 from .srm_detector import SRMDetector
 from .ucf_detector import UCFDetector
+from .ylw_detector import YLWDetector
 from .recce_detector import RecceDetector
 from .fwa_detector import FWADetector
 from .ffd_detector import FFDDetector

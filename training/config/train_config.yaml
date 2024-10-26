@@ -1,5 +1,5 @@
 mode: train
-lmdb: True
+lmdb: False
 dry_run: false
 rgb_dir: './datasets/rgb'
 lmdb_dir:  './datasets/lmdb'
@@ -41,3 +41,36 @@ label_dict:
   # Roop
   roop_Real: 0
   roop_Fake: 1
+  # A_data
+  A_data_Fake: 1
+  A_data_Real: 0
+  # B_data
+  B_data_Fake: 1
+  B_data_Real: 0
+  # phase
+  phase_Fake: 1
+  phase_Real: 0
+  # debug_train
+  debug_train_Fake: 1
+  debug_train_Real: 0
+  # debug_test
+  debug_test_Fake: 1
+  debug_test_Real: 0
+  # my_data
+  my_data_Fake: 1
+  my_data_Real: 0
+  # whichfacecisreal
+  whichfaceisreal_Fake: 1
+  whichfaceisreal_Real: 0
+  # web
+  web_Fake: 1
+  web_Real: 0
+  # archive
+  archive_Fake: 1
+  archive_Real: 0
+  # a512
+  a512_Fake: 1
+  a512_Real: 0
+  # Mid
+  Mid_Fake: 1
+  Mid_Real: 0
