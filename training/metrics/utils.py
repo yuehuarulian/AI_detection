@@ -87,12 +87,7 @@ def get_test_metrics(y_pred, y_true, img_names):
     csv_data = []
     for name, pred_class, confidence in zip(img_names, prediction_class, y_pred):
         name = name.replace('\\', '/')
-        csv_data.append([name.split('/')[-1].split('.')[0], pred_class, confidence])
-
-    with open('output.csv', 'w', newline='') as csvfile:
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(['name', 'label', 'confidence'])
-        csv_writer.writerows(csv_data)
+        csv_data.append([name.split('/')[-1].split('.')[0], pred_class])
     correct = (prediction_class == np.clip(y_true, a_min=0, a_max=1)).sum().item()
     acc = correct / len(prediction_class)
     # if type(img_names[0]) is not list:
@@ -102,4 +97,4 @@ def get_test_metrics(y_pred, y_true, img_names):
         # video-level methods
     v_auc=auc
 
-    return {'acc': acc, 'auc': auc, 'eer': eer, 'ap': ap, 'pred': y_pred, 'video_auc': v_auc, 'label': y_true}
+    return {'acc': acc, 'auc': auc, 'eer': eer, 'ap': ap, 'pred': y_pred, 'video_auc': v_auc, 'label': y_true, 'csv_data': csv_data}

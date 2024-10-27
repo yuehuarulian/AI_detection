@@ -88,10 +88,11 @@ class Trainer(object):
             # update directory path
             writer_path = os.path.join(
                 self.log_dir,
-                phase,
-                dataset_key,
-                metric_key,
-                "metric_board"
+                "tensorboard"
+                # phase,
+                # dataset_key,
+                # metric_key,
+                # "metric_board"
             )
             os.makedirs(writer_path, exist_ok=True)
             # update writers dictionary

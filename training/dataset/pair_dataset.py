@@ -35,8 +35,14 @@ class pairDataset(DeepfakeAbstractBaseDataset):
         real_landmark_path = real_image_path.replace('frames', 'landmarks').replace('.png', '.npy')
 
         # Load the fake and real images
-        fake_image = self.load_rgb(fake_image_path)
-        real_image = self.load_rgb(real_image_path)
+        try:
+            fake_image = self.load_rgb(fake_image_path)
+        except OSError:
+            print(f"Warning: Could not load image {fake_image_path}.")
+        try:
+            real_image = self.load_rgb(real_image_path)
+        except OSError:
+            print(f"Warning: Could not load image {real_image_path}.")
 
         fake_image = np.array(fake_image)  # Convert to numpy array for data augmentation
         real_image = np.array(real_image)  # Convert to numpy array for data augmentation

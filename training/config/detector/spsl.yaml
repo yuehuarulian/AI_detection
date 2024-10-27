@@ -16,7 +16,7 @@ backbone_config:
 
 # dataset
 all_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT, FaceShifter, DeepFakeDetection, Celeb-DF-v1, Celeb-DF-v2, DFDCP, DFDC, DeeperForensics-1.0, UADFV]
-train_dataset: [A_data, web, phase, whichfaceisreal]
+train_dataset: [A_data,web,my_data,whichfaceisreal]
 test_dataset: [B_data,]
 
 compression: c23  # compression-level for videos

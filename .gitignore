@@ -1,7 +1,5 @@
-*.dat
 *.log
 *.csv
-*.pth
 *.pyc
 pretrained/
 logs/
@@ -9,3 +7,4 @@ datasets/
 training/dataset/__pycache__/
 .vscode/
 *log.txt
+preprocessing/dataset_json/*.json

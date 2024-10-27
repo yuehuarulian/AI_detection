@@ -65,12 +65,6 @@ label_dict:
   # web
   web_Fake: 1
   web_Real: 0
-  # archive
-  archive_Fake: 1
-  archive_Real: 0
-  # a512
-  a512_Fake: 1
-  a512_Real: 0
-  # Mid
-  Mid_Fake: 1
-  Mid_Real: 0
+  # web2
+  web2_Fake: 1
+  web2_Real: 0

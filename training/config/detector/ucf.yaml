@@ -18,7 +18,7 @@ backbone_config:
 
 # dataset
 all_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT, FaceShifter, DeepFakeDetection, Celeb-DF-v1, Celeb-DF-v2, DFDCP, DFDC, DeeperForensics-1.0, UADFV]
-train_dataset: [web]
+train_dataset: [A_data,web,web2,whichfaceisreal]
 test_dataset: [B_data,]
 dataset_type: pair
 # all_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT, FaceShifter, DeepFakeDetection, Celeb-DF-v1, Celeb-DF-v2, DFDCP, DFDC, DeeperForensics-1.0, UADFV]
@@ -97,6 +97,9 @@ label_dict:
   # web
   web_Fake: 1
   web_Real: 0
+  # web2
+  web2_Fake: 1
+  web2_Real: 0
 
 
 
