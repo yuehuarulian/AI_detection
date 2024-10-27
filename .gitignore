@@ -8,3 +8,4 @@ training/dataset/__pycache__/
 .vscode/
 *log.txt
 preprocessing/dataset_json/*.json
+ylw_model/*pth
