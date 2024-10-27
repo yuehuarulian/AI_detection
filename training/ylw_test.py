@@ -132,11 +132,11 @@ def test_epoch(model, test_data_loaders):
         predictions_nps, label_nps,feat_nps = test_one_dataset(model, test_data_loaders[key])
         
         # compute metric for each dataset
-        metric_one_dataset = get_test_metrics(y_pred=predictions_nps, y_true=label_nps,
+        metric_one_dataset, csv_data = get_test_metrics(y_pred=predictions_nps, y_true=label_nps,
                                               img_names=data_dict['image'])
         metrics_all_datasets[key] = metric_one_dataset
 
-    return metrics_all_datasets
+    return metrics_all_datasets, csv_data
 
 @torch.no_grad()
 def inference(model, data_dict):
@@ -188,15 +188,12 @@ def main():
         print('Fail to load the pre-trained weights')
     
     # start testing
-    best_metric = test_epoch(model, test_data_loaders)
-    keys = test_data_loaders.keys()
-    for key in keys:
-        csv_data = best_metric[key]['csv_data']
-        csv_data.sort(key=lambda x: x[0].lower()) # TODO
-        with open(os.path.join(args.csv_path,'cla_pre.csv'), 'w', newline='') as csvfile:
-            csv_writer = csv.writer(csvfile)
-            csv_writer.writerows(csv_data)
-        print('===> Test Done!')
+    _, csv_data = test_epoch(model, test_data_loaders)
+    csv_data.sort(key=lambda x: x[0].lower()) # TODO
+    with open(os.path.join(args.csv_path,'cla_pre.csv'), 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerows(csv_data)
+    print('===> Test Done!')
 
 if __name__ == '__main__':
     main()

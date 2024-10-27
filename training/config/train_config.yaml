@@ -68,3 +68,6 @@ label_dict:
   # web2
   web2_Fake: 1
   web2_Real: 0
+  # starganv2
+  starganv2_Fake: 1
+  starganv2_Real: 0

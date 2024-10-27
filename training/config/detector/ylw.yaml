@@ -18,8 +18,8 @@ backbone_config:
 
 # dataset
 all_dataset: [A_data,starganv2,web,web2,whichfaceisreal,testdata]
-train_dataset: [A_data,starganv2,web,web2,whichfaceisreal]
-test_dataset: [B_data,]
+train_dataset: [starganv2,web,web2,whichfaceisreal]
+test_dataset: [A_data,]
 dataset_type: pair
 specific_task_number: 5
 
@@ -96,7 +96,9 @@ label_dict:
   # whichfaceisreal
   whichfaceisreal_Fake: 1
   whichfaceisreal_Real: 0
-
+  # starganv2
+  starganv2_Fake: 1
+  starganv2_Real: 0
 
 # data augmentation
 use_data_augmentation: true  # Add this flag to enable/disable data augmentation
