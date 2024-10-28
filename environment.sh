@@ -15,5 +15,6 @@ pip install einops
 pip install transformers
 pip install albumentations
 pip install lmdb
-conda install pandas tensorboard matplotlib imgaugy
-conda install -c conda-forge dlib
+pip install numpy==1.24.4
+conda install pytorch torchvision torchaudio pytorch-cuda=12.4 -c pytorch -c nvidia
+conda install -c conda-forge dlib pandas tensorboard matplotlib imgaug

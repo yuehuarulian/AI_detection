@@ -36,10 +36,10 @@ def main():
     print('main.py所在位置:',current_file_dir)
     os.chdir(current_file_dir)
     
-    # pretrained
-    url = "https://github.com/SCLBD/DeepfakeBench/releases/download/v1.0.0/pretrained.zip"
-    dest_folder =  "./"
-    download_pretrained_weights(url, dest_folder)
+    # # pretrained
+    # url = "https://github.com/SCLBD/DeepfakeBench/releases/download/v1.0.0/pretrained.zip"
+    # dest_folder =  "./"
+    # download_pretrained_weights(url, dest_folder)
 
     # test_rearrange
     command = [
