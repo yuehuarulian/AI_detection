@@ -1,5 +1,10 @@
-## ⏳ Quick Start
+## 📚 model
 
+![alt text](figures\ylw模型架构.jpg)
+
+For detailed model architecture, please refer to the documentation.
+
+## ⏳ Quick Start
 ### 1. Installation
 1. (option 1) You can run the following script to configure the necessary environment:
 
