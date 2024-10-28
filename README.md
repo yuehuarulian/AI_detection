@@ -16,12 +16,12 @@ sh environment.sh
 
 All datasets used in our model can be downloaded here   // TODO
 
-| Types                     | Links| Notes|       
+<!-- | Types                     | Links| Notes|       
 | -------------------------|------- | ----------------------- |
 | **Rgb-format Datasets**  | [Password: ogjn](https://pan.baidu.com/s/1NAMUHcZvsIm7l6hMHeEQjQ?pwd=ogjn)| Preprocessed data|       
 | **Lmdb-format Datasets** | [Password: g3gj](https://pan.baidu.com/s/1riMCN5iXTJ2g9fQjtlZswg?pwd=g3gj)| LMDB database for each dataset|       
 | **Json Configurations**  | [Password: dcwv](https://pan.baidu.com/s/1d7PTV2GK-fpGibcbtnQDqQ?pwd=dcwv)| Data arrangement|       
-
+ -->
 
 The provided datasets are:
 
@@ -29,7 +29,8 @@ The provided datasets are:
 | ------------------------------- | ----------------------- |
 | A_data                          | -                       |
 | starganv2                       | -                       |
-| web,web2                        |  From Website           |
+| web                             |  From Website           |
+| web2                            |  From Website           |
 | whichfaceisreal                 | -                       |
 | B_data                          |  Only Test Data         |
 

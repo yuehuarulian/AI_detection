@@ -15,9 +15,9 @@ backbone_config:
   dropout: false
 
 # dataset
-all_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT, FaceShifter, DeepFakeDetection, Celeb-DF-v1, Celeb-DF-v2, DFDCP, DFDC, DeeperForensics-1.0, UADFV]
-train_dataset: [A_data,web,my_data,whichfaceisreal]
-test_dataset: [B_data,]
+all_dataset: [A_data,starganv2,web,web2,whichfaceisreal,testdata]
+train_dataset: [starganv2,web,web2,whichfaceisreal]
+test_dataset: [A_data,]
 
 compression: c23  # compression-level for videos
 train_batchSize: 32   # training batch size

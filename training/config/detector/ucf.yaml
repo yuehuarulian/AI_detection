@@ -17,9 +17,9 @@ backbone_config:
   dropout: false
 
 # dataset
-all_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT, FaceShifter, DeepFakeDetection, Celeb-DF-v1, Celeb-DF-v2, DFDCP, DFDC, DeeperForensics-1.0, UADFV]
-train_dataset: [A_data,web,web2,whichfaceisreal]
-test_dataset: [B_data,]
+all_dataset: [A_data,starganv2,web,web2,whichfaceisreal,testdata]
+train_dataset: [starganv2,web,web2,whichfaceisreal]
+test_dataset: [A_data,]
 dataset_type: pair
 # all_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT, FaceShifter, DeepFakeDetection, Celeb-DF-v1, Celeb-DF-v2, DFDCP, DFDC, DeeperForensics-1.0, UADFV]
 # train_dataset: [FF-F2F, FF-DF, FF-FS, FF-NT,]

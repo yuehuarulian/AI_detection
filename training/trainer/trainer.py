@@ -225,7 +225,7 @@ class Trainer(object):
             times_per_epoch = 1
 
 
-        #times_per_epoch=4
+        times_per_epoch = 10
 
         test_step = len(train_data_loader) // times_per_epoch    # test 10 times per epoch
         step_cnt = epoch * len(train_data_loader)
