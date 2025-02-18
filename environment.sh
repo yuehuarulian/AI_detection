@@ -1,5 +1,4 @@
 #!/bin/bash
-pip3 install torch torchvision torchaudio
 pip install tqdm
 pip install PyYAML
 pip install imutils

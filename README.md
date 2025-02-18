@@ -1,6 +1,6 @@
 ## 📚 model
 
-![alt text](figures\ylw模型架构.jpg)
+![alt text](figures/ylw模型架构.jpg)
 
 For detailed model architecture, please refer to the documentation.
 
