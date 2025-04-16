@@ -46,26 +46,26 @@ Upon downloading the datasets, please ensure to store them in the [`./datasets`]
 datasets
 ├── A_data
 │   ├── fake
-│   │   └── frame
+│   │   └── frames
 │   |           ├── 0/*.png
 │   |           ├── 1/*.png
 │   |           ├── ...
 │   |           └── xxxx/*.png
 │   └── real
-│         └── frame
+│         └── frames
 │               ├── 0/*.png
 │               ├── 1/*.png
 │               ├── ...
 │               └── xxxx/*.png
 └── web
     ├── fake
-    │   └── frame
+    │   └── frames
     |           ├── 0/*.png
     |           ├── 1/*.png
     |           ├── ...
     |           └── xxxx/*.png
     └── real
-          └── frame
+          └── frames
                 ├── 0/*.png
                 ├── 1/*.png
                 ├── ...

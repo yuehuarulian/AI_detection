@@ -118,7 +118,7 @@ class UCFDetector(AbstractDetector):
         rec_loss_class = LOSSFUNC[config['loss_func']['rec_loss']]
         cls_loss_func = cls_loss_class()
         spe_loss_func = spe_loss_class()
-        con_loss_func = con_loss_class(margin=3.0)
+        con_loss_func = con_loss_class(margin=3.0) # 公式5
         rec_loss_func = rec_loss_class()
         loss_func = {
             'cls': cls_loss_func, 
@@ -187,7 +187,7 @@ class UCFDetector(AbstractDetector):
         loss_con = self.loss_func['con'](common_features, specific_features, label_spe)
 
         # 5. total loss
-        loss = loss_sha + 0.1*loss_spe + 0.3*loss_reconstruction + 0.05*loss_con
+        loss = loss_sha + 0.1*loss_spe + 0.3*loss_reconstruction + 0.05*loss_con # 公式9
         loss_dict = {
             'overall': loss,
             'common': loss_sha,

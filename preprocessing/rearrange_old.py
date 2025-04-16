@@ -144,7 +144,6 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                 # Iterate over all videos
                 for video_path in os.scandir(os.path.join(dataset_path, 'original_sequences', 'youtube', compression_level, 'videos')):
                     if video_path.is_file() and video_path.name.endswith('.mp4'):  # 只处理 mp4 文件
-                        video_name = video_path.name.split('.mp4')[0]  # 获取视频名称（去掉扩展名）
                         
                         # 创建每个视频的文件夹（如果没有的话）
                         video_folder = os.path.join(dataset_path, 'original_sequences', 'youtube', compression_level, 'frames', video_name)
@@ -170,15 +169,14 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                                 frame_paths.append(frame_path)
 
                                 # 保存帧为图像文件
-                                if os.path.exists(frame_path):
-                                    continue
                                 cv2.imwrite(frame_path, frame)
+
                             frame_count += 1
                             
                         # 将帧路径存入字典
                         video_capture.release()
                         mode = video_to_mode[video_name]
-                        # frame_paths = [os.path.join(video_path, frame.name) for frame in os.scandir(video_path)]
+                        frame_paths = [os.path.join(video_path, frame.name) for frame in os.scandir(video_path)]
                         dataset_dict['FaceForensics++']['FF-real'][mode][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths}
                         
             label = 'DFD_Real'  
@@ -221,8 +219,6 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                                 frame_paths.append(frame_path)
 
                                 # 保存帧为图像文件
-                                if os.path.exists(frame_path):
-                                    continue
                                 cv2.imwrite(frame_path, frame)
 
                             frame_count += 1
@@ -281,8 +277,6 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                                             frame_paths.append(frame_path)
 
                                             # 保存帧为图像文件
-                                            if os.path.exists(frame_path):
-                                                continue
                                             cv2.imwrite(frame_path, frame)
 
                                         frame_count += 1
@@ -291,7 +285,7 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                                     dataset_dict[dataset_name][label]['train'][video_name] = {'label': label, 'frames': frame_paths}
                                     video_capture.release()
 
-                                    # frame_paths = [os.path.join(video_path, frame.name) for frame in os.scandir(video_path)]
+                                    frame_paths = [os.path.join(video_path, frame.name) for frame in os.scandir(video_path)]
                                     if label != 'FaceShifter':
                                         mask_paths = os.path.join(dataset_path, 'manipulated_sequences', label, 'c23','masks', video_name)
                                         # mask is all the same for all compression levels
@@ -402,8 +396,6 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                             frame_paths.append(frame_path)
 
                             # 保存帧为图像文件
-                            if os.path.exists(frame_path):
-                                continue
                             cv2.imwrite(frame_path, frame)
 
                         frame_count += 1
@@ -512,7 +504,7 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                 continue
             if folder.name in ['test']:
                 # 读取csv文件
-                df = pd.read_csv(os.path.join(dataset_path,'sample_submission.csv'))
+                df = pd.read_csv(os.path.join(dataset_path,folder.name,'labels.csv'))
                 labels = ['DFDC_Real','DFDC_Fake']
                 # 循环遍历每一行，并逐行读取filename和label的值
                 for index, row in df.iterrows():
@@ -541,8 +533,6 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                             frame_paths.append(frame_path)
 
                             # 保存帧为图像文件
-                            if os.path.exists(frame_path):
-                                continue
                             cv2.imwrite(frame_path, frame)
                         frame_count += 1
                     video_capture.release()
@@ -579,10 +569,8 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                                 frame_filename = f"{video_name}_frame_{frame_count}.png"
                                 frame_path = os.path.join(video_folder, frame_filename)
                                 frame_paths.append(frame_path)
-                                
-                                if os.path.exists(frame_path):
-                                    continue
                                 cv2.imwrite(frame_path, frame)
+
                             frame_count += 1
                         video_capture.release()
 

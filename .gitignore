@@ -9,3 +9,5 @@ training/dataset/__pycache__/
 *log.txt
 preprocessing/dataset_json/*.json
 ylw_model/*pth
+
+data/
