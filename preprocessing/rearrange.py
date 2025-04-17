@@ -81,7 +81,7 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
 
     ## FaceForensics++ dataset or DeepfakeDetection dataset
     ## Note: DeepfakeDetection dataset is a subset of FaceForensics++ dataset
-    if dataset_name == 'FaceForensics++' or dataset_name == 'DeepFakeDetection' or dataset_name == 'FaceShifter': 
+    if dataset_name == 'FaceForensics++': 
         ff_dict = {
             'Deepfakes': 'FF-DF',
             'Face2Face': 'FF-F2F',
@@ -128,7 +128,7 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
             label = 'Real'
             dataset_dict['FaceForensics++'] = {}
             dataset_dict['FaceForensics++']['FF-real'] = {}
-            dataset_dict['FaceForensics++']['DFD_real'] = {}
+            # dataset_dict['FaceForensics++']['DFD_real'] = {}
             
             # Iterate over all compression levels: c23, c40, raw
             dataset_dict['FaceForensics++']['FF-real']['train'] = {}
@@ -140,7 +140,14 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                     dataset_dict['FaceForensics++']['FF-real']['train'][compression_level] = {}
                     dataset_dict['FaceForensics++']['FF-real']['test'][compression_level] = {}
                     dataset_dict['FaceForensics++']['FF-real']['val'][compression_level] = {}
-            
+                
+                
+                if not any(os.scandir(os.path.join(dataset_path, 'original_sequences', 'youtube', compression_level, 'videos'))):
+                    for frame_path in os.scandir(os.path.join(dataset_path, 'original_sequences', 'youtube', compression_level, 'frames')):
+                        frame_paths = []
+                        frame_paths = glob.glob(os.path.join(frame_path, '*png'))
+                        mode = video_to_mode[frame_path.name]
+                        dataset_dict['FaceForensics++']['FF-real']['train'][compression_level][frame_path.name] = {'label': ff_dict[label], 'frames': frame_paths}
                 # Iterate over all videos
                 for video_path in os.scandir(os.path.join(dataset_path, 'original_sequences', 'youtube', compression_level, 'videos')):
                     if video_path.is_file() and video_path.name.endswith('.mp4'):  # 只处理 mp4 文件
@@ -148,96 +155,46 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                         
                         # 创建每个视频的文件夹（如果没有的话）
                         video_folder = os.path.join(dataset_path, 'original_sequences', 'youtube', compression_level, 'frames', video_name)
+                        frame_paths = []
+                        if os.path.exists(video_folder):
+                            frame_paths = glob.glob(os.path.join(video_folder, '*png'))
+
                         if not os.path.exists(video_folder):
                             os.makedirs(video_folder)  # 如果文件夹不存在，创建它
                         
-                        # 使用 OpenCV 读取视频文件
-                        video_capture = cv2.VideoCapture(video_path.path)
-                        frame_paths = []
-                        frame_count = 0
-                        frame_interval = 20  # 每隔 20 帧保存一张图像
-
-                        while True:
-                            ret, frame = video_capture.read()
-                            if not ret:
-                                break  # 如果视频读取完毕，退出循环
-                            
-                            # 每 20 帧保存一次图像
-                            if frame_count % frame_interval == 0:
-                                # 构造帧图像的保存路径
-                                frame_filename = f"{video_name}_frame_{frame_count}.png"
-                                frame_path = os.path.join(video_folder, frame_filename)
-                                frame_paths.append(frame_path)
-
-                                # 保存帧为图像文件
-                                if os.path.exists(frame_path):
-                                    continue
-                                cv2.imwrite(frame_path, frame)
-                            frame_count += 1
-                            
+                            # 使用 OpenCV 读取视频文件
+                            video_capture = cv2.VideoCapture(video_path.path)
+                            frame_count = 0
+                            frame_interval = 20  # 每隔 20 帧保存一张图像
+    
+                            while True:
+                                ret, frame = video_capture.read()
+                                if not ret:
+                                    break  # 如果视频读取完毕，退出循环
+                                
+                                # 每 20 帧保存一次图像
+                                if frame_count % frame_interval == 0:
+                                    # 构造帧图像的保存路径
+                                    frame_filename = f"{video_name}_frame_{frame_count}.png"
+                                    frame_path = os.path.join(video_folder, frame_filename)
+                                    frame_paths.append(frame_path)
+    
+                                    # 保存帧为图像文件
+                                    if os.path.exists(frame_path):
+                                        continue
+                                    cv2.imwrite(frame_path, frame)
+                                frame_count += 1
+                                
+                            video_capture.release()
+                        
                         # 将帧路径存入字典
-                        video_capture.release()
                         mode = video_to_mode[video_name]
                         # frame_paths = [os.path.join(video_path, frame.name) for frame in os.scandir(video_path)]
                         dataset_dict['FaceForensics++']['FF-real'][mode][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths}
-                        
-            label = 'DFD_Real'  
-            # Same operations for DeepfakeDetection real dataset
-            dataset_dict['FaceForensics++']['DFD_real']['train'] = {}
-            dataset_dict['FaceForensics++']['DFD_real']['test'] = {}
-            dataset_dict['FaceForensics++']['DFD_real']['val'] = {}
-            for compression_level in os.scandir(os.path.join(dataset_path, 'original_sequences', 'actors')):
-                if compression_level.is_dir() and compression_level.name in ["c23", "c40", "raw"]:
-                    compression_level = compression_level.name
-                    dataset_dict['FaceForensics++']['DFD_real']['train'][compression_level] = {}
-                    dataset_dict['FaceForensics++']['DFD_real']['test'][compression_level] = {}
-                    dataset_dict['FaceForensics++']['DFD_real']['val'][compression_level] = {}
-                # Iterate over all videos
-                for video_path in os.scandir(os.path.join(dataset_path, 'original_sequences', 'actors', compression_level, 'videos')):
-                    if video_path.is_file() and video_path.name.endswith('.mp4'):  # 只处理 mp4 文件
-                        video_name = video_path.name.split('.mp4')[0]  # 获取视频名称（去掉扩展名）
-                        
-                        # 创建每个视频的文件夹（如果没有的话）
-                        video_folder = os.path.join(dataset_path, 'original_sequences', 'actors', compression_level, 'frames', video_name)
-                        if not os.path.exists(video_folder):
-                            os.makedirs(video_folder)  # 如果文件夹不存在，创建它
 
-                        # 使用 OpenCV 读取视频文件
-                        video_capture = cv2.VideoCapture(video_path.path)
-                        frame_paths = []
-                        frame_count = 0
-                        frame_interval = 20  # 每隔 20 帧保存一张图像
-
-                        while True:
-                            ret, frame = video_capture.read()
-                            if not ret:
-                                break  # 如果视频读取完毕，退出循环
-                            
-                            # 每 20 帧保存一次图像
-                            if frame_count % frame_interval == 0:
-                                # 构造帧图像的保存路径
-                                frame_filename = f"{video_name}_frame_{frame_count}.png"
-                                frame_path = os.path.join(video_folder, frame_filename)
-                                frame_paths.append(frame_path)
-
-                                # 保存帧为图像文件
-                                if os.path.exists(frame_path):
-                                    continue
-                                cv2.imwrite(frame_path, frame)
-
-                            frame_count += 1
-
-                        # 将帧路径存入字典
-                        # video_name = video_path.name
-                        # frame_paths = [os.path.join(video_path, frame.name) for frame in os.scandir(video_path)]
-                        dataset_dict['FaceForensics++']['DFD_real']['train'][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths}
-                        dataset_dict['FaceForensics++']['DFD_real']['test'][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths}
-                        dataset_dict['FaceForensics++']['DFD_real']['val'][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths}
-                        video_capture.release()
-        # FaceForensics++ fake datasets
         if os.path.isdir(os.path.join(dataset_path, 'manipulated_sequences')):
             for label_dir in os.scandir(os.path.join(dataset_path, 'manipulated_sequences')):
-                if label_dir.is_dir():
+                if label_dir.is_dir() and ff_dict[label_dir.name] != 'DFD_fake':
                     label = label_dir.name
                     dataset_dict['FaceForensics++'][ff_dict[label]] = {}
                     dataset_dict['FaceForensics++'][ff_dict[label]]['train'] = {}
@@ -252,6 +209,13 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                             dataset_dict['FaceForensics++'][ff_dict[label]]['test'][compression_level] = {}
                             dataset_dict['FaceForensics++'][ff_dict[label]]['val'][compression_level] = {}
                             # Iterate over all videos
+                
+                
+                            if not any(os.scandir(os.path.join(dataset_path, 'manipulated_sequences', label, compression_level, 'videos'))):
+                                for frame_path in os.scandir(os.path.join(dataset_path, 'manipulated_sequences', label, compression_level, 'frames')):
+                                    frame_paths = []
+                                    frame_paths = glob.glob(os.path.join(frame_path, '*png'))
+                                    dataset_dict[dataset_name][ff_dict[label]]['train'][compression_level][frame_path.name] = {'label': ff_dict[label], 'frames': frame_paths}
 
                             for video_path in os.scandir(os.path.join(dataset_path, 'manipulated_sequences', label, compression_level, 'videos')):
                                 if video_path.is_file() and video_path.name.endswith('.mp4'):
@@ -259,37 +223,39 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
 
                                     # 创建每个视频的文件夹（如果没有的话）
                                     video_folder = os.path.join(dataset_path, 'manipulated_sequences', label, compression_level, 'frames', video_name)
+                                    
+                                    frame_paths = []
+                                    if os.path.exists(video_folder):
+                                        frame_paths = glob.glob(os.path.join(video_folder, '*png'))
+
                                     if not os.path.exists(video_folder):
                                         os.makedirs(video_folder)  # 如果文件夹不存在，创建它
 
-                                    # 使用 OpenCV 读取视频文件
-                                    video_capture = cv2.VideoCapture(video_path.path)
-                                    frame_paths = []
-                                    frame_count = 0
-                                    frame_interval = 20  # 每隔 20 帧保存一张图像
+                                        video_capture = cv2.VideoCapture(video_path.path)
+                                        frame_count = 0
+                                        frame_interval = 20  # 每隔 20 帧保存一张图像
 
-                                    while True:
-                                        ret, frame = video_capture.read()
-                                        if not ret:
-                                            break  # 如果视频读取完毕，退出循环
-                                        
-                                        # 每 20 帧保存一次图像
-                                        if frame_count % frame_interval == 0:
-                                            # 构造帧图像的保存路径
-                                            frame_filename = f"{video_name}_frame_{frame_count}.png"
-                                            frame_path = os.path.join(video_folder, frame_filename)
-                                            frame_paths.append(frame_path)
+                                        while True:
+                                            ret, frame = video_capture.read()
+                                            if not ret:
+                                                break  # 如果视频读取完毕，退出循环
+                                            
+                                            # 每 20 帧保存一次图像
+                                            if frame_count % frame_interval == 0:
+                                                # 构造帧图像的保存路径
+                                                frame_filename = f"{video_name}_frame_{frame_count}.png"
+                                                frame_path = os.path.join(video_folder, frame_filename)
+                                                frame_paths.append(frame_path)
 
-                                            # 保存帧为图像文件
-                                            if os.path.exists(frame_path):
-                                                continue
-                                            cv2.imwrite(frame_path, frame)
-
-                                        frame_count += 1
+                                                # 保存帧为图像文件
+                                                if os.path.exists(frame_path):
+                                                    continue
+                                                cv2.imwrite(frame_path, frame)
+                                            frame_count += 1
+                                        video_capture.release()
 
                                     # 将帧路径存入字典
-                                    dataset_dict[dataset_name][label]['train'][video_name] = {'label': label, 'frames': frame_paths}
-                                    video_capture.release()
+                                    dataset_dict[dataset_name][ff_dict[label]]['train'][video_name] = {'label': ff_dict[label], 'frames': frame_paths}
 
                                     # frame_paths = [os.path.join(video_path, frame.name) for frame in os.scandir(video_path)]
                                     if label != 'FaceShifter':
@@ -312,48 +278,235 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                                         mode = video_to_mode[video_name]
                                         dataset_dict['FaceForensics++'][ff_dict[label]][mode][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths}
          
+        for label, value in dataset_dict['FaceForensics++'].items():
+            if label != 'FF-real':
+                with open(os.path.join(output_file_path,f'{label}.json'), 'w') as f:
+                    data = {label: {'FF-real': dataset_dict['FaceForensics++']['FF-real'],
+                                    label: value,
+                                    }}
+                    json.dump(data, f)
+                    print(f"Finish writing {label}.json")
+        drop_DF = False
+        drop_F2F = False
+        drop_FS = False
+        drop_NT = False
+        if drop_DF:
+            del dataset_dict['FaceForensics++']['FF-DF']
+            print("Drop FF-DF")
+        if drop_F2F:
+            del dataset_dict['FaceForensics++']['FF-F2F']
+            print("Drop FF-F2F")
+        if drop_FS:
+            del dataset_dict['FaceForensics++']['FF-FS']
+            print("Drop FF-FS")
+        if drop_NT:
+            del dataset_dict['FaceForensics++']['FF-NT']
+            print("Drop FF-NT")
+        
+        print(dataset_dict['FaceForensics++'].keys())        
 
-        # get the DeepfakeDetection dataset from FaceForensics++ dataset
-        if dataset_name == 'FaceForensics++':
-            # Delete the DeepfakeDetection dataset from FaceForensics++ dataset
-            del dataset_dict['FaceForensics++']['DFD_fake']
-            del dataset_dict['FaceForensics++']['DFD_real']
-            del dataset_dict['FaceForensics++']['FF-FH']
-        elif dataset_name == 'DeepFakeDetection':
-            # Check if the DeepfakeDetection dataset is in the FaceForensics++ dataset
-            if 'DFD_fake' in dataset_dict['FaceForensics++'] and \
-                'DFD_real' in dataset_dict['FaceForensics++']:
-                # Add the DeepfakeDetection dataset to the dataset_dict
-                dataset_dict['DeepFakeDetection'] = {
-                    'DFD_fake': dataset_dict['FaceForensics++']['DFD_fake'], 
-                    'DFD_real': dataset_dict['FaceForensics++']['DFD_real']
-                }
-                del dataset_dict['FaceForensics++']
-        elif dataset_name == 'FaceShifter':
-            if 'FF-FH' in dataset_dict['FaceForensics++'] and \
-                'FF-real' in dataset_dict['FaceForensics++']:
-                # Add the DeepfakeDetection dataset to the dataset_dict
-                dataset_dict['FaceShifter'] = {
-                    'FF-FH': dataset_dict['FaceForensics++']['FF-FH'], 
-                    'FF-real': dataset_dict['FaceForensics++']['FF-real']
-                }
-                del dataset_dict['FaceForensics++']
-            else:
-                # TODO
-                raise ValueError('DeepfakeDetection dataset not found in FaceForensics++ dataset.')
-        else:
-            raise ValueError('Invalid dataset name: {}'.format(dataset_name))
+    ## DeepFakeDetection dataset
+    elif dataset_name == 'DeepFakeDetection' or dataset_name == 'FaceShifter': 
+        ff_dict = {
+            'Deepfakes': 'FF-DF',
+            'Face2Face': 'FF-F2F',
+            'FaceSwap': 'FF-FS',
+            'Real': 'FF-real',
+            'DFD_Real': 'DFD_real',
+            'NeuralTextures': 'FF-NT',
+            'FaceShifter': 'FF-FH',
+            'DeepFakeDetection': 'DFD_fake',
+            'DeepFakeDetection_original': 'DFD_real',
+        }
+        # Load the JSON files for data split
+        dataset_path = os.path.join(dataset_root_path, 'FaceForensics++')
+        
+        # Load the JSON files for data split
+        with open(file=os.path.join(os.path.join(dataset_root_path, 'FaceForensics++', 'train.json')), mode='r') as f:
+            train_json = json.load(f)
+        with open(file=os.path.join(os.path.join(dataset_root_path, 'FaceForensics++', 'val.json')), mode='r') as f:
+            val_json = json.load(f)
+        with open(file=os.path.join(os.path.join(dataset_root_path, 'FaceForensics++', 'test.json')), mode='r') as f:
+            test_json = json.load(f)
+            
+        # Create a dictionary for searching the data split 
+        video_to_mode = dict()
+        for d1, d2 in train_json:
+            video_to_mode[d1] = 'train'
+            video_to_mode[d2] = 'train'
+            video_to_mode[d1+'_'+d2] = 'train'
+            video_to_mode[d2+'_'+d1] = 'train'
+        for d1, d2 in val_json:
+            video_to_mode[d1] = 'val'
+            video_to_mode[d2] = 'val'
+            video_to_mode[d1+'_'+d2] = 'val'
+            video_to_mode[d2+'_'+d1] = 'val'
+        for d1, d2 in test_json:
+            video_to_mode[d1] = 'test'
+            video_to_mode[d2] = 'test'
+            video_to_mode[d1+'_'+d2] = 'test'
+            video_to_mode[d2+'_'+d1] = 'test'
+        
+        
+        # DeepFakeDetection real dataset
+        if os.path.isdir(dataset_path) and os.path.isdir(os.path.join(dataset_path, 'original_sequences')):
+            label = 'Real'
+            dataset_dict['FaceForensics++'] = {}
+            dataset_dict['FaceForensics++']['DFD_real'] = {}
+            
+            label = 'DFD_Real'  
+            # Same operations for DeepfakeDetection real dataset
+            dataset_dict['FaceForensics++']['DFD_real']['train'] = {}
+            dataset_dict['FaceForensics++']['DFD_real']['test'] = {}
+            dataset_dict['FaceForensics++']['DFD_real']['val'] = {}
+            for compression_level in os.scandir(os.path.join(dataset_path, 'original_sequences', 'actors')):
+                if compression_level.is_dir() and compression_level.name in ["c23", "c40", "raw"]:
+                    compression_level = compression_level.name
+                    dataset_dict['FaceForensics++']['DFD_real']['train'][compression_level] = {}
+                    dataset_dict['FaceForensics++']['DFD_real']['test'][compression_level] = {}
+                    dataset_dict['FaceForensics++']['DFD_real']['val'][compression_level] = {}
+                # Iterate over all videos
+                
+                                
+                if not any(os.scandir(os.path.join(dataset_path, 'original_sequences', 'actors', compression_level, 'videos'))):
+                    for frame_path in os.scandir(os.path.join(dataset_path, 'original_sequences', 'actors', compression_level, 'frames')):
+                        frame_paths = []
+                        frame_paths = glob.glob(os.path.join(frame_path, '*png'))
+                        dataset_dict['FaceForensics++']['DFD_real']['train'][compression_level][frame_path.name] = {'label': ff_dict[label], 'frames': frame_paths}
+                        dataset_dict['FaceForensics++']['DFD_real']['test'][compression_level][frame_path.name] = {'label': ff_dict[label], 'frames': frame_paths}
+                        dataset_dict['FaceForensics++']['DFD_real']['val'][compression_level][frame_path.name] = {'label': ff_dict[label], 'frames': frame_paths}
+        
+                for video_path in os.scandir(os.path.join(dataset_path, 'original_sequences', 'actors', compression_level, 'videos')):
+                    if video_path.is_file() and video_path.name.endswith('.mp4'):  # 只处理 mp4 文件
+                        video_name = video_path.name.split('.mp4')[0]  # 获取视频名称（去掉扩展名）
+                        
+                        # 创建每个视频的文件夹（如果没有的话）
+                        video_folder = os.path.join(dataset_path, 'original_sequences', 'actors', compression_level, 'frames', video_name)
+                        frame_paths = []
+                        if os.path.exists(video_folder):
+                            frame_paths = glob.glob(os.path.join(video_folder, '*png'))
 
-        # if FaceForensics++, based on label and generate the json
-        if dataset_name == 'FaceForensics++':
-            for label, value in dataset_dict['FaceForensics++'].items():
-                if label != 'FF-real':
-                    with open(os.path.join(output_file_path,f'{label}.json'), 'w') as f:
-                        data = {label: {'FF-real': dataset_dict['FaceForensics++']['FF-real'],
-                                        label: value,
-                                        }}
-                        json.dump(data, f)
-                        print(f"Finish writing {label}.json")
+                        if not os.path.exists(video_folder):
+                            os.makedirs(video_folder)  # 如果文件夹不存在，创建它
+
+                            video_capture = cv2.VideoCapture(video_path.path)
+                            frame_paths = []
+                            frame_count = 0
+                            frame_interval = 20  # 每隔 20 帧保存一张图像
+
+                            while True:
+                                ret, frame = video_capture.read()
+                                if not ret:
+                                    break  # 如果视频读取完毕，退出循环
+                                
+                                # 每 20 帧保存一次图像
+                                if frame_count % frame_interval == 0:
+                                    # 构造帧图像的保存路径
+                                    frame_filename = f"{video_name}_frame_{frame_count}.png"
+                                    frame_path = os.path.join(video_folder, frame_filename)
+                                    frame_paths.append(frame_path)
+
+                                    # 保存帧为图像文件
+                                    if os.path.exists(frame_path):
+                                        continue
+                                    cv2.imwrite(frame_path, frame)
+
+                                frame_count += 1
+                            video_capture.release()
+
+                        # 将帧路径存入字典
+                        # video_name = video_path.name
+                        # frame_paths = [os.path.join(video_path, frame.name) for frame in os.scandir(video_path)]
+                        dataset_dict['FaceForensics++']['DFD_real']['train'][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths}
+                        dataset_dict['FaceForensics++']['DFD_real']['test'][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths}
+                        dataset_dict['FaceForensics++']['DFD_real']['val'][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths}
+        # DeepFakeDetection fake datasets
+        label = 'DFD_fake'
+        if os.path.isdir(os.path.join(dataset_path, 'manipulated_sequences')):
+            for label_dir in os.scandir(os.path.join(dataset_path, 'manipulated_sequences')):
+                if label_dir.is_dir() and ff_dict[label_dir.name] == 'DFD_fake':
+                    dataset_dict['FaceForensics++']['DFD_fake'] = {}
+                    dataset_dict['FaceForensics++']['DFD_fake']['train'] = {}
+                    dataset_dict['FaceForensics++']['DFD_fake']['test'] = {}
+                    dataset_dict['FaceForensics++']['DFD_fake']['val'] = {}
+                    
+                    # Iterate over all compression levels: c23, c40, raw
+                    for compression_level in os.scandir(os.path.join(dataset_path, 'manipulated_sequences', label_dir.name)):
+                        if compression_level.is_dir() and compression_level.name in ["c23", "c40", "raw"]:
+                            compression_level = compression_level.name
+                            dataset_dict['FaceForensics++']['DFD_fake']['train'][compression_level] = {}
+                            dataset_dict['FaceForensics++']['DFD_fake']['test'][compression_level] = {}
+                            dataset_dict['FaceForensics++']['DFD_fake']['val'][compression_level] = {}
+                            # Iterate over all videos
+
+                            if not any(os.scandir(os.path.join(dataset_path, 'manipulated_sequences', label_dir.name, compression_level, 'videos'))):
+                                for frame_path in os.scandir(os.path.join(dataset_path, 'manipulated_sequences', label_dir.name, compression_level, 'frames')):
+                                    frame_paths = []
+                                    frame_paths = glob.glob(os.path.join(frame_path, '*png'))
+                                    dataset_dict['FaceForensics++']['DFD_fake']['train'][compression_level][frame_path.name] = {'label': label, 'frames': frame_paths}
+                                    dataset_dict['FaceForensics++']['DFD_fake']['val'][compression_level][frame_path.name] = {'label': label, 'frames': frame_paths}
+                                    dataset_dict['FaceForensics++']['DFD_fake']['test'][compression_level][frame_path.name] = {'label': label, 'frames': frame_paths}
+
+                            for video_path in os.scandir(os.path.join(dataset_path, 'manipulated_sequences', label_dir.name, compression_level, 'videos')):
+                                if video_path.is_file() and video_path.name.endswith('.mp4'):
+                                    video_name = video_path.name.split('.mp4')[0]  # 获取视频名称（去掉扩展名）
+
+                                    # 创建每个视频的文件夹（如果没有的话）
+                                    video_folder = os.path.join(dataset_path, 'manipulated_sequences', label_dir.name, compression_level, 'frames', video_name)
+                                    frame_paths = []
+                                    if os.path.exists(video_folder):
+                                        frame_paths = glob.glob(os.path.join(video_folder, '*png'))
+
+                                    if not os.path.exists(video_folder):
+                                        os.makedirs(video_folder)
+                                        video_capture = cv2.VideoCapture(video_path.path)
+                                        frame_count = 0
+                                        frame_interval = 20  # 每隔 20 帧保存一张图像
+
+                                        while True:
+                                            ret, frame = video_capture.read()
+                                            if not ret:
+                                                break  # 如果视频读取完毕，退出循环
+                                            
+                                            # 每 20 帧保存一次图像
+                                            if frame_count % frame_interval == 0:
+                                                # 构造帧图像的保存路径
+                                                frame_filename = f"{video_name}_frame_{frame_count}.png"
+                                                frame_path = os.path.join(video_folder, frame_filename)
+                                                frame_paths.append(frame_path)
+
+                                                # 保存帧为图像文件
+                                                if os.path.exists(frame_path):
+                                                    continue
+                                                cv2.imwrite(frame_path, frame)
+
+                                            frame_count += 1
+                                        video_capture.release()
+
+                                    # 将帧路径存入字典
+                                    dataset_dict['FaceForensics++']['DFD_fake']['train'][video_name] = {'label': label, 'frames': frame_paths}
+
+                                    # frame_paths = [os.path.join(video_path, frame.name) for frame in os.scandir(video_path)]
+                                    mask_paths = os.path.join(dataset_path, 'manipulated_sequences', label, 'c23','masks', video_name)
+                                    # mask is all the same for all compression levels
+                                    if os.path.exists(mask_paths):
+                                        mask_frames_paths = [os.path.join(mask_paths, frame.name) for frame in os.scandir(mask_paths)]
+                                    else:
+                                        mask_frames_paths = []
+                                    try:
+                                        mode = video_to_mode[video_name]
+                                        dataset_dict['FaceForensics++'][ff_dict[label]][mode][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths, 'masks': mask_frames_paths}
+                                    # DeepfakeDetection dataset
+                                    except:
+                                        dataset_dict['FaceForensics++'][ff_dict[label]]['train'][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths, 'masks': mask_frames_paths}
+                                        dataset_dict['FaceForensics++'][ff_dict[label]]['val'][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths, 'masks': mask_frames_paths}
+                                        dataset_dict['FaceForensics++'][ff_dict[label]]['test'][compression_level][video_name] = {'label': ff_dict[label], 'frames': frame_paths, 'masks': mask_frames_paths}
+
+        dataset_dict['DeepFakeDetection'] = {
+            'DFD_fake': dataset_dict['FaceForensics++']['DFD_fake'], 
+            'DFD_real': dataset_dict['FaceForensics++']['DFD_real']
+        }
+        del dataset_dict['FaceForensics++']
     
     ## Celeb-DF-v1 dataset
     ## Note: videos in Celeb-DF-v1/2 are not in the same format as in FaceForensics++ dataset
@@ -380,6 +533,9 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
 
                     # 创建每个视频的文件夹（如果没有的话）
                     video_folder = os.path.join(dataset_path, folder.name, 'frames', video_name)
+                    if os.path.exists(video_folder):
+                        continue
+
                     if not os.path.exists(video_folder):
                         os.makedirs(video_folder)  # 如果文件夹不存在，创建它
 
@@ -522,35 +678,35 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
 
                     # 创建每个视频的文件夹（如果没有的话）
                     video_folder = os.path.join(dataset_path, folder.name, 'frames', vidname)
+                    frame_paths = []
+                    if os.path.exists(video_folder):
+                        frame_paths = glob.glob(os.path.join(video_folder, '*png'))
+
                     if not os.path.exists(video_folder):
                         os.makedirs(video_folder)
-                    # 使用 OpenCV 读取视频文件
-                    video_capture = cv2.VideoCapture(os.path.join(dataset_path, folder.name, row['filename']))
-                    frame_paths = []
-                    frame_count = 0
-                    frame_interval = 20  # 每隔 20 帧保存一张图像
-                    while True:
-                        ret, frame = video_capture.read()
-                        if not ret:
-                            break
-                        # 每 20 帧保存一次图像
-                        if frame_count % frame_interval == 0:
-                            # 构造帧图像的保存路径
-                            frame_filename = f"{vidname}_frame_{frame_count}.png"
-                            frame_path = os.path.join(video_folder, frame_filename)
-                            frame_paths.append(frame_path)
+                        # 使用 OpenCV 读取视频文件
+                        video_capture = cv2.VideoCapture(os.path.join(dataset_path, folder.name, row['filename']))
+                        frame_count = 0
+                        frame_interval = 20  # 每隔 20 帧保存一张图像
+                        while True:
+                            ret, frame = video_capture.read()
+                            if not ret:
+                                break
+                            if frame_count % frame_interval == 0:
+                                frame_filename = f"{vidname}_frame_{frame_count}.png"
+                                frame_path = os.path.join(video_folder, frame_filename)
+                                frame_paths.append(frame_path)
 
-                            # 保存帧为图像文件
-                            if os.path.exists(frame_path):
-                                continue
-                            cv2.imwrite(frame_path, frame)
-                        frame_count += 1
-                    video_capture.release()
+                                if os.path.exists(frame_path):
+                                    continue
+                                cv2.imwrite(frame_path, frame)
+                            frame_count += 1
+                        video_capture.release()
 
                     if len(frame_paths) == 0:
                         continue
                     dataset_dict[dataset_name][label]['test'][vidname] = {'label': label, 'frames': frame_paths}
-                    dataset_dict[dataset_name][label]['val'] = {'label': label, 'frames': frame_paths}
+                    dataset_dict[dataset_name][label]['val'][vidname] = {'label': label, 'frames': frame_paths}
             
             elif folder.name in ['train']:
                 dfdc_train_part = os.path.join(dataset_path, folder.name)
@@ -562,29 +718,34 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                         video_name = video_path.name.split('.mp4')[0]
 
                         video_folder = os.path.join(dataset_path, folder.name, 'frames', video_name)
+                        
+                        frame_paths = []
+                        if os.path.exists(video_folder):
+                            frame_paths = glob.glob(os.path.join(video_folder, '*png'))
+
                         if not os.path.exists(video_folder):
                             os.makedirs(video_folder)
 
-                        video_capture = cv2.VideoCapture(video_path.path)
-                        frame_paths = []
-                        frame_count = 0
-                        frame_interval = 20  # 每隔 20 帧保存一张图像
+                            video_capture = cv2.VideoCapture(video_path.path)
+                            frame_paths = []
+                            frame_count = 0
+                            frame_interval = 20  # 每隔 20 帧保存一张图像
 
-                        while True:
-                            ret, frame = video_capture.read()
-                            if not ret:
-                                break  # 如果视频读取完毕，退出循环
-                            
-                            if frame_count % frame_interval == 0:
-                                frame_filename = f"{video_name}_frame_{frame_count}.png"
-                                frame_path = os.path.join(video_folder, frame_filename)
-                                frame_paths.append(frame_path)
+                            while True:
+                                ret, frame = video_capture.read()
+                                if not ret:
+                                    break  # 如果视频读取完毕，退出循环
                                 
-                                if os.path.exists(frame_path):
-                                    continue
-                                cv2.imwrite(frame_path, frame)
-                            frame_count += 1
-                        video_capture.release()
+                                if frame_count % frame_interval == 0:
+                                    frame_filename = f"{video_name}_frame_{frame_count}.png"
+                                    frame_path = os.path.join(video_folder, frame_filename)
+                                    frame_paths.append(frame_path)
+
+                                    if os.path.exists(frame_path):
+                                        continue
+                                    cv2.imwrite(frame_path, frame)
+                                frame_count += 1
+                            video_capture.release()
 
                         label = metadata[video_name + ".mp4"]["label"]
                         assert label in ['REAL', 'FAKE'], 'Invalid label: {}'.format(label)
@@ -592,8 +753,8 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                             label = 'DFDC_Real'
                         else:
                             label = 'DFDC_Fake'
-                        dataset_dict[dataset_name][label]['train'][video_name] = {'label': label, 'frames': frame_paths}
                         dataset_dict[dataset_name][label]['val'][video_name] = {'label': label, 'frames': frame_paths}
+                        dataset_dict[dataset_name][label]['test'][vidname] = {'label': label, 'frames': frame_paths}
 
     ## DeeperForensics-1.0 dataset
     elif dataset_name == 'DeeperForensics-1.0':
@@ -631,7 +792,6 @@ def generate_dataset_file(dataset_name, dataset_root_path, output_file_path, com
                         frame_paths.remove(frame_path)
                 dataset_dict[dataset_name][label][set_attr][video_name] = {'label': label, 'frames': frame_paths}
         for actor_path in os.scandir(os.path.join(dataset_path, 'source_videos')):
-            print("actor",actor_path.name)
             if not os.path.isdir(actor_path):
                 continue
             label = 'DF_real'

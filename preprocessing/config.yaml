@@ -1,9 +1,9 @@
 rearrange:
   dataset_name: # the name of dataset
     # choices: ['FaceForensics++', 'DeepFakeDetection', 'Celeb-DF-v1', 'Celeb-DF-v2','DFDCP', 'DFDC', 'DeeperForensics-1.0','UADFV','FaceShifter']
-    choices: ['FaceForensics++train', 'FaceForensics++test', 'Celeb-DF-v1', 'DFDC']
+    choices: ['FaceForensics++', 'DeepFakeDetection', 'FaceForensics++train', 'FaceForensics++test', 'Celeb-DF-v1', 'DFDC']
     # default: 'DATASET_YOU_SPECIFY'
-    default: 'DFDC'
+    default: 'FaceForensics++'
     # default: 'web'
     # default: 'web2'
     # default: 'whichfaceisreal'

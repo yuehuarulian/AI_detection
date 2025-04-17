@@ -206,7 +206,7 @@ class DeepfakeAbstractBaseDataset(data.Dataset):
                 label = self.config['label_dict'][video_info['label']]
                 frame_paths = video_info['frames']
                 # sorted video path to the lists
-                if '\\' in frame_paths[0]:
+                if len(frame_paths) and '\\' in frame_paths[0]:
                     frame_paths = sorted(frame_paths, key=lambda x: (x.split('\\')[-1].split('.')[0]))
                 else:
                     frame_paths = sorted(frame_paths, key=lambda x: (x.split('/')[-1].split('.')[0]))
@@ -218,7 +218,7 @@ class DeepfakeAbstractBaseDataset(data.Dataset):
                     total_frames = self.frame_num
                     if self.video_level:
                         # Select clip_size continuous frames
-                        start_frame = random.randint(0, total_frames - self.frame_num)
+                        start_frame = random.randint(0, total_frames - self.frame_num) if self.mode == 'train' else 0
                         frame_paths = frame_paths[start_frame:start_frame + self.frame_num]  # update total_frames
                     else:
                         # Select self.frame_num frames evenly distributed throughout the video
@@ -244,13 +244,13 @@ class DeepfakeAbstractBaseDataset(data.Dataset):
                             # Select clip_size continuous frames from each part of the video
                             for i in range(num_clips):
                                 # Ensure start_frame + self.clip_size - 1 does not exceed the index of the last frame
-                                start_frame = random.randrange(i * clip_step, min((i + 1) * clip_step, total_frames - self.clip_size + 1))
+                                start_frame = random.randrange(i * clip_step, min((i + 1) * clip_step, total_frames - self.clip_size + 1)) if self.mode == 'train' else i * clip_step
                                 continuous_frames = frame_paths[start_frame:start_frame + self.clip_size]
                                 assert len(continuous_frames) == self.clip_size, 'clip_size is not equal to the length of frame_path_list'
                                 selected_clips.append(continuous_frames)
 
                         else:
-                            start_frame = random.randrange(0, total_frames - self.clip_size + 1)
+                            start_frame = random.randrange(0, total_frames - self.clip_size + 1) if self.mode == 'train' else 0
                             continuous_frames = frame_paths[start_frame:start_frame + self.clip_size]
                             assert len(continuous_frames)==self.clip_size, 'clip_size is not equal to the length of frame_path_list'
                             selected_clips.append(continuous_frames)
@@ -296,11 +296,11 @@ class DeepfakeAbstractBaseDataset(data.Dataset):
         size = self.config['resolution'] # if self.mode == "train" else self.config['resolution']
         if not self.lmdb:
             if not file_path[0] == '.':
-                file_path =  os.path.join(self.config["rgb_dir"],file_path)
+                file_path =  f'./{self.config["rgb_dir"]}\\'+file_path
             assert os.path.exists(file_path), f"{file_path} does not exist"
-            # img = cv2.imread(file_path)
-            img = Image.open(file_path).convert('RGB')  # 转换为 RGB 格式
-            img = np.array(img)  # 将 PIL 图像转换为 numpy 数组
+            img = cv2.imread(file_path)
+            if img is None:
+                raise ValueError('Loaded image is None: {}'.format(file_path))
         elif self.lmdb:
             with self.env.begin(write=False) as txn:
                 # transfer the path format from rgb-path to lmdb-key
@@ -310,7 +310,7 @@ class DeepfakeAbstractBaseDataset(data.Dataset):
                 image_bin = txn.get(file_path.encode())
                 image_buf = np.frombuffer(image_bin, dtype=np.uint8)
                 img = cv2.imdecode(image_buf, cv2.IMREAD_COLOR)
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, (size, size), interpolation=cv2.INTER_CUBIC)
         return Image.fromarray(np.array(img, dtype=np.uint8))
 

@@ -88,11 +88,10 @@ class Trainer(object):
             # update directory path
             writer_path = os.path.join(
                 self.log_dir,
-                "tensorboard"
-                # phase,
-                # dataset_key,
-                # metric_key,
-                # "metric_board"
+                phase,
+                dataset_key,
+                metric_key,
+                "metric_board"
             )
             os.makedirs(writer_path, exist_ok=True)
             # update writers dictionary
@@ -225,7 +224,7 @@ class Trainer(object):
             times_per_epoch = 1
 
 
-        times_per_epoch = 10
+        #times_per_epoch=4
 
         test_step = len(train_data_loader) // times_per_epoch    # test 10 times per epoch
         step_cnt = epoch * len(train_data_loader)

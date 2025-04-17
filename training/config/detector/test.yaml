@@ -19,8 +19,8 @@ backbone_config:
 # dataset
 
 all_dataset: ['FaceForensics++train', 'FaceForensics++test', 'Celeb-DF-v1', 'DeepFakeDetection', 'DFDC']
-train_dataset: ['FaceForensics++train']
-test_dataset: ['Celeb-DF-v1', 'DFDC']
+train_dataset: ['FaceForensics++']
+test_dataset: ['Celeb-DF-v1', 'DeepFakeDetection', 'DFDC']
 dataset_type: pair
 # all_dataset: [FaceForensics++, FF-F2F, FF-DF, FF-FS, FF-NT, FaceShifter, DeepFakeDetection, Celeb-DF-v1, Celeb-DF-v2, DFDCP, DFDC, DeeperForensics-1.0, UADFV]
 # train_dataset: [FF-F2F, FF-DF, FF-FS, FF-NT,]
@@ -31,7 +31,7 @@ compression: c23  # compression-level for videos
 train_batchSize: 16   # training batch size
 test_batchSize: 32   # test batch size
 workers: 8   # number of data loading workers
-frame_num: {'train': 1, 'test': 1}   # number of frames to use per video in training and testing
+frame_num: {'train': 8, 'test': 8}   # number of frames to use per video in training and testing
 resolution: 256   # resolution of output image to network
 with_mask: false   # whether to include mask information in the input
 with_landmark: false   # whether to include facial landmark information in the input
@@ -44,14 +44,16 @@ label_dict:
   # DFD
   DFD_fake: 1
   DFD_real: 0
+  DFD_Fake: 1
+  DFD_Real: 0
   FaceShifter: 1
   FF-FH: 1
   # FF++ + FaceShifter(FF-real+FF-FH)
   # ucf specific label setting
   FF-DF: 1
-  FF-F2F: 2
-  FF-FS: 3
-  FF-NT: 4
+  FF-F2F: 1
+  FF-FS: 1
+  FF-NT: 1
   FF-real: 0
   # CelebDF
   CelebDFv1_real: 0
@@ -144,7 +146,7 @@ optimizer:
 
 # training config
 lr_scheduler: null   # learning rate scheduler
-nEpochs: 10   # number of epochs to train for
+nEpochs: 5   # number of epochs to train for
 start_epoch: 0   # manual epoch number (useful for restarts)
 save_epoch: 1   # interval epochs for saving models
 rec_iter: 100   # interval iterations for recording
